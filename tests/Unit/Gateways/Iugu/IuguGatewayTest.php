@@ -3,12 +3,10 @@
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
-use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\IuguGateway;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
-use ValeSaude\PaymentGatewayClient\ValueObjects\CPF;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Email;
-use ValeSaude\PaymentGatewayClient\ValueObjects\ZipCode;
+use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasCustomerHelperMethodsTrait;
+
+uses(HasCustomerHelperMethodsTrait::class);
 
 $baseUrl = 'https://some.url';
 
@@ -18,7 +16,7 @@ test('createCustomer returns external id on success', function () use ($baseUrl)
     // given
     $expectedExternalId = 'some-external-id';
     $expectedInternalId = 'some-internal-id';
-    $data = createCustomerDTO();
+    $data = $this->createCustomerDTO();
     Http::fake(["{$baseUrl}/v1/customers" => Http::response(['id' => $expectedExternalId])]);
 
     // when
@@ -46,7 +44,7 @@ test('createCustomer returns external id on success', function () use ($baseUrl)
 
 test('createCustomer throws RequestException on HTTP error response', function () use ($baseUrl) {
     // given
-    $data = createCustomerDTO();
+    $data = $this->createCustomerDTO();
     Http::fake(["{$baseUrl}/v1/customers" => Http::response(null, 400)]);
 
     // when
@@ -60,20 +58,3 @@ test('getGatewayIdentifier returns expected identifier', function () {
     // then
     expect($identifier)->toEqual('iugu');
 });
-
-function createCustomerDTO(): CustomerDTO
-{
-    return new CustomerDTO(
-        'Some Name',
-        new CPF('74406433058'),
-        new Email('some@mail.com'),
-        new Address(
-            new ZipCode('01001000'),
-            'Some Street',
-            1,
-            'Some District',
-            'Some City',
-            'SP'
-        )
-    );
-}

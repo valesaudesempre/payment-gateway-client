@@ -1,22 +1,8 @@
 <?php
 
 use Illuminate\Contracts\Container\BindingResolutionException;
-use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Gateways\Contracts\GatewayInterface;
 use ValeSaude\PaymentGatewayClient\Gateways\GatewayManager;
-
-class DummyGateway implements GatewayInterface
-{
-    public function createCustomer(CustomerDTO $data, string $internalId): string
-    {
-        throw new BadMethodCallException();
-    }
-
-    public function getGatewayIdentifier(): string
-    {
-        throw new BadMethodCallException();
-    }
-}
 
 it('resolves a valid gateway using its slug', function () {
     // given
