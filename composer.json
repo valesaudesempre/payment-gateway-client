@@ -3,7 +3,8 @@
     "type": "library",
     "autoload": {
         "psr-4": {
-            "ValeSaude\\PaymentGatewayClient\\": "src/"
+            "ValeSaude\\PaymentGatewayClient\\": "src/",
+            "ValeSaude\\PaymentGatewayClient\\Database\\Factories\\": "database/factories"
         }
     },
     "autoload-dev": {
