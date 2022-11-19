@@ -26,4 +26,11 @@ class Client
 
         return tap($customer)->save();
     }
+
+    public function updateCustomer(Customer $customer, CustomerDTO $data): Customer
+    {
+        $this->client->updateCustomer($customer->gateway_id, $data);
+
+        return $customer->updateUsingCustomerDTO($data);
+    }
 }
