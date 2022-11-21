@@ -17,7 +17,7 @@ class CustomerFactory extends Factory
     {
         return [
             'gateway_id' => $this->faker->uuid(),
-            'gateway_slug' => $this->faker->slug(),
+            'gateway_slug' => 'mock',
             'name' => $this->faker->name(),
             'document_number' => new CPF($this->faker->cpf()),
             'email' => new Email($this->faker->unique()->safeEmail()),

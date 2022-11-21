@@ -23,6 +23,9 @@ trait MocksGatewayMethodsTrait
     public function createGatewayMock(): GatewayInterface
     {
         $this->gatewayMock = $this->createMock(GatewayInterface::class);
+        $this->gatewayMock
+            ->method('getGatewayIdentifier')
+            ->willReturn('mock');
 
         return $this->gatewayMock;
     }
