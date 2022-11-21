@@ -13,7 +13,8 @@ class PaymentGatewayClientServiceProvider extends PackageServiceProvider
     {
         $package->name('payment-gateway-client')
             ->hasMigrations(
-                '2022_11_17_190221_create_payment_gateway_customers_table'
+                '2022_11_17_190221_create_payment_gateway_customers_table',
+                '2022_11_18_180000_create_payment_gateway_payment_methods_table'
             )
             ->runsMigrations(true);
     }

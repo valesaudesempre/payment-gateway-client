@@ -3,7 +3,6 @@
 namespace ValeSaude\PaymentGatewayClient;
 
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
-use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Gateways\Contracts\GatewayInterface;
 use ValeSaude\PaymentGatewayClient\Gateways\Enums\GatewayFeature;
 use ValeSaude\PaymentGatewayClient\Models\Customer;
