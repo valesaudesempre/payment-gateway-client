@@ -29,7 +29,7 @@ test('createCustomer POST to /v1/customers and returns external id on success', 
 
         return data_get($body, 'email') === (string) $data->email &&
             data_get($body, 'name') === $data->name &&
-            data_get($body, 'cpf_cnpj') === (string) $data->documentNumber &&
+            data_get($body, 'cpf_cnpj') === $data->document->getNumber() &&
             data_get($body, 'zip_code') === (string) $data->address->getZipCode() &&
             data_get($body, 'number') === $data->address->getNumber() &&
             data_get($body, 'street') === $data->address->getStreet() &&
@@ -66,7 +66,7 @@ test('updateCustomer PUT to /v1/customers/{id}', function () use ($baseUrl) {
 
         return data_get($body, 'email') === (string) $data->email &&
             data_get($body, 'name') === $data->name &&
-            data_get($body, 'cpf_cnpj') === (string) $data->documentNumber &&
+            data_get($body, 'cpf_cnpj') === $data->document->getNumber() &&
             data_get($body, 'zip_code') === (string) $data->address->getZipCode() &&
             data_get($body, 'number') === $data->address->getNumber() &&
             data_get($body, 'street') === $data->address->getStreet() &&

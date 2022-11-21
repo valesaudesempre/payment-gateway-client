@@ -12,6 +12,7 @@ return new class() extends Migration {
             $table->string('gateway_id')->nullable();
             $table->string('gateway_slug');
             $table->string('name');
+            $table->string('document_type');
             $table->string('document_number');
             $table->string('email');
             $table->json('address');
