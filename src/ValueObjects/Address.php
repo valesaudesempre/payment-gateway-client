@@ -5,11 +5,10 @@ namespace ValeSaude\PaymentGatewayClient\ValueObjects;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Support\Arrayable;
-use JsonException;
-use JsonSerializable;
-use ValeSaude\PaymentGatewayClient\Utils\JSON;
+use ValeSaude\PaymentGatewayClient\Casts\JsonSerializableValueObjectCast;
+use ValeSaude\PaymentGatewayClient\ValueObjects\Contracts\JsonSerializableValueObjectInterface;
 
-class Address extends AbstractValueObject implements Arrayable, JsonSerializable, Castable
+class Address extends AbstractValueObject implements Arrayable, Castable, JsonSerializableValueObjectInterface
 {
     private ZipCode $zipCode;
     private string $street;
@@ -42,6 +41,11 @@ class Address extends AbstractValueObject implements Arrayable, JsonSerializable
      */
     public function jsonSerialize(): array
     {
+        return $this->toArray();
+    }
+
+    public function toArray(): array
+    {
         return [
             'zip_code' => (string) $this->zipCode,
             'street' => $this->street,
@@ -51,11 +55,6 @@ class Address extends AbstractValueObject implements Arrayable, JsonSerializable
             'state' => $this->state,
             'complement' => $this->complement,
         ];
-    }
-
-    public function toArray(): array
-    {
-        return get_object_vars($this);
     }
 
     public function getZipCode(): ZipCode
@@ -123,29 +122,6 @@ class Address extends AbstractValueObject implements Arrayable, JsonSerializable
      */
     public static function castUsing(array $arguments): CastsAttributes
     {
-        return new class() implements CastsAttributes {
-            /**
-             * @param string               $value
-             * @param array<string, mixed> $attributes
-             *
-             * @throws JsonException
-             */
-            public function get($model, string $key, $value, array $attributes): Address
-            {
-                // @phpstan-ignore-next-line
-                return Address::fromArray(JSON::decode($value));
-            }
-
-            /**
-             * @param Address              $value
-             * @param array<string, mixed> $attributes
-             *
-             * @throws JsonException
-             */
-            public function set($model, string $key, $value, array $attributes): string
-            {
-                return JSON::encode($value);
-            }
-        };
+        return new JsonSerializableValueObjectCast(static::class);
     }
 }
