@@ -12,6 +12,15 @@ use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
 use ValeSaude\PaymentGatewayClient\ValueObjects\CPF;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Email;
 
+/**
+ * @property string      $id
+ * @property string      $name
+ * @property CPF         $document_number
+ * @property Email       $email
+ * @property Address     $address
+ * @property string|null $gateway_id
+ * @property string      $gateway_slug
+ */
 class Customer extends Model
 {
     use GeneratesUUIDOnInitializeTrait;

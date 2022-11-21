@@ -7,5 +7,3 @@ parameters:
         - src
     tmpDir: build/phpstan
     checkModelProperties: true
-    ignoreErrors:
-        - '#Access to an undefined property ValeSaude\\PaymentGatewayClient\\Models.+#'

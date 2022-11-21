@@ -21,7 +21,6 @@ class JsonSerializableValueObjectCast extends AbstractValueObjectCast
     {
         $class = $this->valueObjectClass;
 
-        // @phpstan-ignore-next-line
         return $class::fromArray(JSON::decode($value));
     }
 

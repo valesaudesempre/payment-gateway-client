@@ -30,6 +30,9 @@ class CreditCard extends AbstractValueObject implements Arrayable, Castable, Jso
         $this->expirationYear = $expirationYear;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function jsonSerialize(): array
     {
         return $this->toArray();
@@ -79,8 +82,8 @@ class CreditCard extends AbstractValueObject implements Arrayable, Castable, Jso
      *     holder_name: string,
      *     number: string,
      *     brand: string,
-     *     expiration_month: Month,
-     *     expiration_year: PositiveInteger
+     *     expiration_month: int,
+     *     expiration_year: int
      * } $attributes
      */
     public static function fromArray(array $attributes): self

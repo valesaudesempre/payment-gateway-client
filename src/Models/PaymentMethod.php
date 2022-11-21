@@ -10,6 +10,16 @@ use ValeSaude\PaymentGatewayClient\Database\Factories\PaymentMethodFactory;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
 use ValeSaude\PaymentGatewayClient\ValueObjects\CreditCard;
 
+/**
+ * @property string      $id
+ * @property string|null $gateway_id
+ * @property string      $gateway_slug
+ * @property string      $description
+ * @property CreditCard  $card
+ * @property bool        $is_default
+ * @property string      $customer_id
+ * @property Customer    $customer
+ */
 class PaymentMethod extends Model
 {
     use GeneratesUUIDOnInitializeTrait;
@@ -19,6 +29,10 @@ class PaymentMethod extends Model
     protected $table = 'payment_gateway_payment_methods';
     protected $guarded = [];
     protected $keyType = 'string';
+
+    /**
+     * @var array<string, mixed>
+     */
     protected $attributes = [
         'is_default' => false,
     ];

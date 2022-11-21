@@ -35,6 +35,7 @@ class Client
     public function updateCustomer(Customer $customer, CustomerDTO $data): Customer
     {
         if ($this->gateway->isFeatureSupported(GatewayFeature::CUSTOMER())) {
+            // @phpstan-ignore-next-line
             $this->gateway->updateCustomer($customer->gateway_id, $data);
         }
 
@@ -49,6 +50,7 @@ class Client
         $this->ensureFeatureIsSupported(GatewayFeature::PAYMENT_METHOD());
 
         $paymentMethod = PaymentMethod::fromPaymentMethodDTO($data);
+        // @phpstan-ignore-next-line
         $gatewayPaymentMethod = $this->gateway->createPaymentMethod($customer->gateway_id, $data, $setAsDefault);
 
         $paymentMethod->card = $gatewayPaymentMethod->card;

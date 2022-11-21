@@ -21,14 +21,14 @@ class PaymentGatewayClientServiceProvider extends PackageServiceProvider
 
     public function packageRegistered(): void
     {
-        $this->app->bind(GatewayInterface::class, static function () {
+        $this->app->bind(GatewayInterface::class, static function (): GatewayInterface {
             $defaultGateway = config('payment-gateway-client.default_gateway');
             $class = config("payment-gateway-client.gateways.{$defaultGateway}");
 
             return resolve($class);
         });
 
-        $this->app->bind(IuguGateway::class, static function () {
+        $this->app->bind(IuguGateway::class, static function (): IuguGateway {
             return new IuguGateway(
                 config('services.iugu.base_url', 'https://api.iugu.com'),
                 config('services.iugu.api_key')
