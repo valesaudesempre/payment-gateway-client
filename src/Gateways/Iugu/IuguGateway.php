@@ -7,10 +7,10 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
-use ValeSaude\PaymentGatewayClient\Gateways\Contracts\GatewayInterface;
+use ValeSaude\PaymentGatewayClient\Gateways\AbstractGateway;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Builders\IuguCustomerBuilder;
 
-class IuguGateway implements GatewayInterface
+class IuguGateway extends AbstractGateway
 {
     private string $baseUrl;
     private string $apiKey;
@@ -39,10 +39,7 @@ class IuguGateway implements GatewayInterface
         return $response->json('id');
     }
 
-    /**
-     * @param string $id
-     */
-    public function updateCustomer($id, CustomerDTO $data): void
+    public function updateCustomer(string $id, CustomerDTO $data): void
     {
         $this->doRequest(
             'PUT',
