@@ -1,15 +1,30 @@
 <?php
 
+use Carbon\Carbon;
 use ValeSaude\PaymentGatewayClient\Client;
 use ValeSaude\PaymentGatewayClient\Customer\GatewayPaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Exceptions\UnsupportedFeatureException;
 use ValeSaude\PaymentGatewayClient\Gateways\Enums\GatewayFeature;
+use ValeSaude\PaymentGatewayClient\Invoice\Builders\InvoiceBuilder;
+use ValeSaude\PaymentGatewayClient\Invoice\Collections\GatewayInvoiceItemDTOCollection;
+use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoicePaymentMethod;
+use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoiceStatus;
+use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceDTO;
+use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceItemDTO;
+use ValeSaude\PaymentGatewayClient\Invoice\InvoiceItemDTO;
 use ValeSaude\PaymentGatewayClient\Models\Customer;
 use ValeSaude\PaymentGatewayClient\Models\PaymentMethod;
+use ValeSaude\PaymentGatewayClient\Models\Recipient;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasCustomerHelperMethodsTrait;
+use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasInvoiceHelperMethodsTrait;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\MocksGatewayMethodsTrait;
+use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
-uses(HasCustomerHelperMethodsTrait::class, MocksGatewayMethodsTrait::class);
+uses(
+    HasCustomerHelperMethodsTrait::class,
+    HasInvoiceHelperMethodsTrait::class,
+    MocksGatewayMethodsTrait::class
+);
 
 beforeEach(function () {
     $this->createGatewayMock();
@@ -136,7 +151,9 @@ test('createPaymentMethod updates default payment method when setAsDefault is tr
     $creditCard = $this->createCreditCard();
     $this->mockGatewaySupportedFeature(GatewayFeature::PAYMENT_METHOD());
     $this->gatewayMock
+        ->expects($this->once())
         ->method('createPaymentMethod')
+        ->with($customer->gateway_id, $data, true)
         ->willReturnCallback(static fn () => new GatewayPaymentMethodDTO($expectedId, $creditCard));
 
     // when
@@ -147,3 +164,132 @@ test('createPaymentMethod updates default payment method when setAsDefault is tr
         ->and($paymentMethod->description)->toEqual($data->description)
         ->and($previouslyDefaultPaymentMethod->refresh()->is_default)->toBeFalse();
 });
+
+test('createInvoice creates an invoice using its gateway and returns and Invoice instance when gateway supports INVOICE feature', function () {
+    // given
+    $recipient = Recipient::factory()->create();
+    $customer = Customer::factory()->create();
+    $item1 = new GatewayInvoiceItemDTO('some-item-id-1', new Money(1000), 1, 'Item 1 description');
+    $item2 = new GatewayInvoiceItemDTO('some-item-id-2', new Money(2000), 3, 'Item 2 description');
+    $gatewayItems = GatewayInvoiceItemDTOCollection::make()
+        ->add($item1)
+        ->add($item2);
+    $data = InvoiceBuilder::make()
+        ->setDueDate(Carbon::now()->addWeek())
+        ->setMaxInstallments(12)
+        ->setAvailablePaymentMethods(InvoicePaymentMethod::CREDIT_CARD())
+        ->addItem(InvoiceItemDTO::fromGatewayInvoiceItemDTO($item1))
+        ->addItem(InvoiceItemDTO::fromGatewayInvoiceItemDTO($item2))
+        ->addSplit($recipient, new Money(500))
+        ->get();
+    $expectedURL = 'https://some.url/some-invoice-id';
+    $expectedInvoiceId = 'some-invoice-id';
+    $expectedBankSlipCode = 'some-bank-slip-code';
+    $expectedPixCode = 'some-pix-code';
+    $this->mockGatewayMultipleSupportedFeatures([
+        GatewayFeature::INVOICE()->value => true,
+        GatewayFeature::INVOICE_SPLIT()->value => true,
+    ]);
+    $this->gatewayMock
+        ->expects($this->once())
+        ->method('createInvoice')
+        ->with($customer->gateway_id, $data)
+        ->willReturnCallback(function () use ($data, $gatewayItems, $expectedURL, $expectedInvoiceId, $expectedBankSlipCode, $expectedPixCode) {
+            return new GatewayInvoiceDTO(
+                $expectedInvoiceId,
+                $expectedURL,
+                $data->dueDate,
+                InvoiceStatus::PENDING(),
+                $gatewayItems,
+                $expectedBankSlipCode,
+                $expectedPixCode
+            );
+        });
+
+    // when
+    $invoice = $this->sut->createInvoice($customer, $data);
+
+    // then
+    expect($invoice->gateway_id)->toEqual($expectedInvoiceId)
+        ->and($invoice->gateway_slug)->toEqual('mock')
+        ->and($invoice->url)->toEqual($expectedURL)
+        ->and($invoice->bank_slip_code)->toEqual($expectedBankSlipCode)
+        ->and($invoice->pix_code)->toEqual($expectedPixCode)
+        ->and($invoice->status)->toEqual(InvoiceStatus::PENDING());
+    $this->expectInvoiceToBeEqualsToData($invoice, $data);
+    $this->expectInvoiceToContainAllGatewayItems($invoice, $gatewayItems);
+});
+
+test('createInvoice creates allows specifying custom payer for invoice', function () {
+    // given
+    $customer = Customer::factory()->create();
+    $item = new InvoiceItemDTO(new Money(1000), 1, 'Some description');
+    $data = InvoiceBuilder::make()
+        ->addItem($item)
+        ->get();
+    $payer = $this->createCustomerDTO();
+    $this->mockGatewayMultipleSupportedFeatures([
+        GatewayFeature::INVOICE()->value => true,
+        GatewayFeature::INVOICE_SPLIT()->value => true,
+    ]);
+    $this->gatewayMock
+        ->expects($this->once())
+        ->method('createInvoice')
+        ->with($customer->gateway_id, $data, $payer)
+        ->willReturnCallback(function () use ($data, $item) {
+            return new GatewayInvoiceDTO(
+                'some-invoice-id',
+                'https://some.url/some-invoice-id',
+                $data->dueDate,
+                InvoiceStatus::PENDING(),
+                GatewayInvoiceItemDTOCollection::make()
+                    ->add(GatewayInvoiceItemDTO::fromInvoiceItemDTO($item))
+            );
+        });
+
+    // when
+    $this->sut->createInvoice($customer, $data, $payer);
+});
+
+test('createInvoice creates an Invoice internally and returns when gateway does not support INVOICE feature', function () {
+    // given
+    $customer = Customer::factory()->create();
+    $data = InvoiceBuilder::make()
+        ->setDueDate(Carbon::now()->addWeek())
+        ->setMaxInstallments(12)
+        ->addItem(new InvoiceItemDTO(new Money(1000), 1, 'Item 1 description'))
+        ->addItem(new InvoiceItemDTO(new Money(2000), 3, 'Item 2 description'))
+        ->get();
+    $this->mockGatewaySupportedFeature(GatewayFeature::INVOICE(), false);
+    $this->gatewayMock
+        ->expects($this->never())
+        ->method('createInvoice');
+
+    // when
+    $invoice = $this->sut->createInvoice($customer, $data);
+
+    // then
+    expect($invoice->gateway_id)->toBeNull()
+        ->and($customer->gateway_slug)->toEqual('mock')
+        ->and($invoice->bank_slip_code)->toBeNull()
+        ->and($invoice->pix_code)->toBeNull()
+        ->and($invoice->status)->toEqual(InvoiceStatus::PENDING());
+    $this->expectInvoiceToBeEqualsToData($invoice, $data);
+    $this->expectInvoiceToContainAllItems($invoice, $data->items);
+});
+
+test('createPaymentMethod throws when gateway does not support INVOICE_SPLIT feature', function () {
+    // given
+    $recipient = Recipient::factory()->create();
+    $customer = Customer::factory()->create();
+    $data = InvoiceBuilder::make()
+        ->addSplit($recipient, new Money(1000))
+        ->get();
+    $this->mockGatewaySupportedFeature(GatewayFeature::INVOICE_SPLIT(), false);
+
+    // when
+    $this->sut->createInvoice($customer, $data);
+})->throws(
+    UnsupportedFeatureException::class,
+    'The gateway "mock" does not support "INVOICE_SPLIT" feature.'
+);
