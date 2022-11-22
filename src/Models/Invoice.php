@@ -74,6 +74,14 @@ class Invoice extends AbstractModel
         return $this->hasMany(InvoiceItem::class);
     }
 
+    public function markAsPaid(): void
+    {
+        $this->update([
+            'status' => InvoiceStatus::PAID(),
+            'paid_at' => Carbon::now(),
+        ]);
+    }
+
     public static function fromInvoiceDTO(InvoiceDTO $data): self
     {
         return new self([

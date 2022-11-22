@@ -72,6 +72,14 @@ class Customer extends AbstractModel
         );
     }
 
+    public function getDefaultPaymentMethod(): ?PaymentMethod
+    {
+        return $this
+            ->paymentMethods()
+            ->whereIsDefault(1)
+            ->first();
+    }
+
     public static function fromCustomerDTO(CustomerDTO $data): self
     {
         return new self([

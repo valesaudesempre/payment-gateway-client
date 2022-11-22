@@ -13,6 +13,7 @@ use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceItemDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\InvoiceItemDTO;
 use ValeSaude\PaymentGatewayClient\Models\Customer;
+use ValeSaude\PaymentGatewayClient\Models\Invoice;
 use ValeSaude\PaymentGatewayClient\Models\PaymentMethod;
 use ValeSaude\PaymentGatewayClient\Models\Recipient;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasCustomerHelperMethodsTrait;
@@ -293,3 +294,76 @@ test('createPaymentMethod throws when gateway does not support INVOICE_SPLIT fea
     UnsupportedFeatureException::class,
     'The gateway "mock" does not support "INVOICE_SPLIT" feature.'
 );
+
+test('chargeInvoiceUsingPaymentMethod charges an invoice using its gateway and returns the paid Invoice instance', function () {
+    // given
+    $invoice = Invoice::factory()->create();
+    $customer = $invoice->customer;
+    $paymentMethod = PaymentMethod
+        ::factory()
+        ->for($customer)
+        ->create();
+    $this->gatewayMock
+        ->expects($this->once())
+        ->method('chargeInvoiceUsingPaymentMethod')
+        ->with($invoice->gateway_id, $customer->gateway_id, $paymentMethod->gateway_id);
+
+    // when
+    $this->sut->chargeInvoiceUsingPaymentMethod($invoice, $customer, $paymentMethod);
+
+    // then
+    expect($invoice->status->equals(InvoiceStatus::PAID()))->toBeTrue()
+        ->and($invoice->paid_at->toDateString())->toEqual(Carbon::today()->toDateString());
+});
+
+test('chargeInvoiceUsingPaymentMethod charges using the default Customer payment method when none is provided', function () {
+    // given
+    $invoice = Invoice::factory()->create();
+    $customer = $invoice->customer;
+    $paymentMethod = PaymentMethod
+        ::factory()
+        ->for($customer)
+        ->asDefault()
+        ->create();
+    $this->gatewayMock
+        ->expects($this->once())
+        ->method('chargeInvoiceUsingPaymentMethod')
+        ->with($invoice->gateway_id, $customer->gateway_id, $paymentMethod->gateway_id);
+
+    // when
+    $this->sut->chargeInvoiceUsingPaymentMethod($invoice, $customer);
+
+    // then
+    expect($invoice->status->equals(InvoiceStatus::PAID()))->toBeTrue()
+        ->and($invoice->paid_at->toDateString())->toEqual(Carbon::today()->toDateString());
+});
+
+test('chargeInvoiceUsingPaymentMethod throws when no payment method is provided and Customer does not have a default one', function () {
+    // given
+    $invoice = Invoice::factory()->create();
+    $customer = $invoice->customer;
+
+    // when
+    $this->sut->chargeInvoiceUsingPaymentMethod($invoice, $customer);
+})->throws(
+    InvalidArgumentException::class,
+    'The customer does not have a default payment method.'
+);
+
+test('chargeInvoiceUsingToken charges an invoice using its gateway and returns the paid Invoice instance', function () {
+    // given
+    $invoice = Invoice::factory()->create();
+    $customer = $invoice->customer;
+    $token = 'some-token';
+    $this->gatewayMock
+        ->expects($this->once())
+        ->method('chargeInvoiceUsingToken')
+        ->with($invoice->gateway_id, $token);
+
+    // when
+    $this->sut->chargeInvoiceUsingToken($invoice, $token);
+
+    // then
+    expect($invoice->status->equals(InvoiceStatus::PAID()))->toBeTrue()
+        ->and($invoice->paid_at->toDateString())->toEqual(Carbon::today()->toDateString());
+});

@@ -2,6 +2,7 @@
 
 namespace ValeSaude\PaymentGatewayClient;
 
+use InvalidArgumentException;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Exceptions\UnsupportedFeatureException;
@@ -117,6 +118,39 @@ class Client
                 'description' => $item->description,
             ])
         );
+
+        return $invoice;
+    }
+
+    public function chargeInvoiceUsingPaymentMethod(
+        Invoice $invoice,
+        Customer $customer,
+        ?PaymentMethod $method = null
+    ): Invoice {
+        if (!$method) {
+            $defaultPaymentMethod = $customer->getDefaultPaymentMethod();
+
+            if (!$defaultPaymentMethod) {
+                throw new InvalidArgumentException('The customer does not have a default payment method.');
+            }
+
+            $method = $defaultPaymentMethod;
+        }
+
+        // @phpstan-ignore-next-line
+        $this->gateway->chargeInvoiceUsingPaymentMethod($invoice->gateway_id, $customer->gateway_id, $method->gateway_id);
+
+        $invoice->markAsPaid();
+
+        return $invoice;
+    }
+
+    public function chargeInvoiceUsingToken(Invoice $invoice, string $token): Invoice
+    {
+        // @phpstan-ignore-next-line
+        $this->gateway->chargeInvoiceUsingToken($invoice->gateway_id, $token);
+
+        $invoice->markAsPaid();
 
         return $invoice;
     }
