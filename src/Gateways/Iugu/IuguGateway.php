@@ -2,6 +2,7 @@
 
 namespace ValeSaude\PaymentGatewayClient\Gateways\Iugu;
 
+use Carbon\Carbon;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
@@ -11,6 +12,12 @@ use ValeSaude\PaymentGatewayClient\Customer\GatewayPaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Gateways\AbstractGateway;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Builders\IuguCustomerBuilder;
+use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Builders\IuguInvoiceBuilder;
+use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Exceptions\GenericErrorResponseException;
+use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Exceptions\ValidationErrorResponseException;
+use ValeSaude\PaymentGatewayClient\Gateways\Utils\AttributeConverter;
+use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceDTO;
+use ValeSaude\PaymentGatewayClient\Invoice\InvoiceDTO;
 use ValeSaude\PaymentGatewayClient\ValueObjects\CreditCard;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Month;
 use ValeSaude\PaymentGatewayClient\ValueObjects\PositiveInteger;
@@ -82,6 +89,39 @@ class IuguGateway extends AbstractGateway
         );
     }
 
+    public function createInvoice(
+        ?string $customerId,
+        InvoiceDTO $data,
+        CustomerDTO $payer,
+        string $externalReference
+    ): GatewayInvoiceDTO {
+        $builder = IuguInvoiceBuilder::make()
+            ->fromInvoiceDTO($data)
+            ->setExternalReference($externalReference)
+            ->setPayer($payer);
+
+        if (isset($customerId)) {
+            $builder->setCustomerId($customerId);
+        }
+
+        $response = $this->doRequest(
+            'POST',
+            'v1/invoices',
+            $builder->get()
+        );
+
+        return new GatewayInvoiceDTO(
+            $response->json('id'),
+            $response->json('secure_url'),
+            // @phpstan-ignore-next-line
+            Carbon::make($response->json('due_date')),
+            AttributeConverter::convertIuguStatusToInvoiceStatus($response->json('status')),
+            AttributeConverter::convertInvoiceItemsToGatewayInvoiceItemDTOCollection($response->json('items')),
+            $response->json('bank_slip.digitable_line'),
+            $response->json('pix.qrcode_text')
+        );
+    }
+
     public function getGatewayIdentifier(): string
     {
         return 'iugu';
@@ -106,10 +146,30 @@ class IuguGateway extends AbstractGateway
         /** @var Response $response */
         $response = $pendingRequest->{strtolower($method)}($uri, $data);
 
-        if ($throwOnError) {
-            $response->throw();
+        if ($throwOnError && $response->failed()) {
+            $this->handleErrors($response);
         }
 
         return $response;
+    }
+
+    /**
+     * @throws RequestException
+     *
+     * @return never
+     */
+    protected function handleErrors(Response $response): void
+    {
+        $errors = $response->json('errors');
+
+        if (empty($errors)) {
+            $response->throw();
+        }
+
+        if (422 === $response->status()) {
+            throw ValidationErrorResponseException::withErrors($errors);
+        }
+
+        throw GenericErrorResponseException::withErrors($errors);
     }
 }
