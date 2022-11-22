@@ -4,6 +4,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
+use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\TransactionDeclinedException;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\IuguGateway;
 use ValeSaude\PaymentGatewayClient\Invoice\Builders\InvoiceBuilder;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoicePaymentMethod;
@@ -245,6 +246,82 @@ test('createInvoice POST to v1/invoices and returns GatewayInvoiceDTO on success
             data_get($body, 'external_reference') === $expectedExternalId;
     });
 });
+
+test('chargeInvoiceUsingPaymentMethod POST to /v1/charge', function () use ($baseUrl) {
+    // given
+    $invoiceId = 'some-invoice-id';
+    $customerId = 'some-customer-id';
+    $paymentMethodId = 'some-payment-method-id';
+    Http::fake(["{$baseUrl}/v1/charge" => Http::response(['success' => true])]);
+
+    // when
+    $this->sut->chargeInvoiceUsingPaymentMethod($invoiceId, $customerId, $paymentMethodId);
+
+    // then
+    Http::assertSent(static function (Request $request) use ($invoiceId, $customerId, $paymentMethodId) {
+        $body = $request->data();
+
+        return data_get($body, 'invoice_id') === $invoiceId &&
+            data_get($body, 'customer_id') === $customerId &&
+            data_get($body, 'customer_payment_method_id') === $paymentMethodId;
+    });
+});
+
+test('chargeInvoiceUsingPaymentMethod throws TransactionDeclinedException when authorization fails', function () use ($baseUrl) {
+    // given
+    Http::fake(["{$baseUrl}/v1/charge" => Http::response(['success' => false, 'LR' => '01'])]);
+
+    // when
+    $this->sut->chargeInvoiceUsingPaymentMethod('some-invoice-id', 'some-customer-id', 'some-payment-method-id');
+})->throws(
+    TransactionDeclinedException::class,
+    'Transaction declined with LR 01.'
+);
+
+test('chargeInvoiceUsingPaymentMethod throws RequestException on HTTP error response', function () use ($baseUrl) {
+    // given
+    Http::fake(["{$baseUrl}/v1/charge" => Http::response(null, 400)]);
+
+    // when
+    $this->sut->chargeInvoiceUsingPaymentMethod('some-invoice-id', 'some-customer-id', 'some-payment-method-id');
+})->throws(RequestException::class);
+
+test('chargeInvoiceUsingToken POST to /v1/charge', function () use ($baseUrl) {
+    // given
+    $invoiceId = 'some-invoice-id';
+    $token = 'some-token';
+    Http::fake(["{$baseUrl}/v1/charge" => Http::response(['success' => true])]);
+
+    // when
+    $this->sut->chargeInvoiceUsingToken($invoiceId, $token);
+
+    // then
+    Http::assertSent(static function (Request $request) use ($invoiceId, $token) {
+        $body = $request->data();
+
+        return data_get($body, 'invoice_id') === $invoiceId &&
+            data_get($body, 'token') === $token;
+    });
+});
+
+test('chargeInvoiceUsingToken throws TransactionDeclinedException when authorization fails', function () use ($baseUrl) {
+    // given
+    Http::fake(["{$baseUrl}/v1/charge" => Http::response(['success' => false, 'LR' => '01'])]);
+
+    // when
+    $this->sut->chargeInvoiceUsingToken('some-invoice-id', 'some-token');
+})->throws(
+    TransactionDeclinedException::class,
+    'Transaction declined with LR 01.'
+);
+
+test('chargeInvoiceUsingToken throws RequestException on HTTP error response', function () use ($baseUrl) {
+    // given
+    Http::fake(["{$baseUrl}/v1/charge" => Http::response(null, 400)]);
+
+    // when
+    $this->sut->chargeInvoiceUsingToken('some-invoice-id', 'some-token');
+})->throws(RequestException::class);
 
 test('getGatewayIdentifier returns expected identifier', function () {
     // when
