@@ -7,7 +7,13 @@ use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Exceptions\UnsupportedFeatureException;
 use ValeSaude\PaymentGatewayClient\Gateways\Contracts\GatewayInterface;
 use ValeSaude\PaymentGatewayClient\Gateways\Enums\GatewayFeature;
+use ValeSaude\PaymentGatewayClient\Invoice\Collections\GatewayInvoiceItemDTOCollection;
+use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoiceStatus;
+use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceItemDTO;
+use ValeSaude\PaymentGatewayClient\Invoice\InvoiceDTO;
+use ValeSaude\PaymentGatewayClient\Invoice\InvoiceItemDTO;
 use ValeSaude\PaymentGatewayClient\Models\Customer;
+use ValeSaude\PaymentGatewayClient\Models\Invoice;
 use ValeSaude\PaymentGatewayClient\Models\PaymentMethod;
 
 class Client
@@ -64,6 +70,55 @@ class Client
         }
 
         return $paymentMethod;
+    }
+
+    public function createInvoice(Customer $customer, InvoiceDTO $data, ?CustomerDTO $payer = null): Invoice
+    {
+        if (isset($data->splits) && count($data->splits)) {
+            $this->ensureFeatureIsSupported(GatewayFeature::INVOICE_SPLIT());
+        }
+
+        $invoice = Invoice::fromInvoiceDTO($data);
+        $items = null;
+
+        if ($this->gateway->isFeatureSupported(GatewayFeature::INVOICE())) {
+            $gatewayInvoice = $this->gateway->createInvoice(
+                $customer->gateway_id,
+                $data,
+                $payer ?? $customer->toCustomerDTO(),
+                $invoice->id
+            );
+
+            $invoice->url = $gatewayInvoice->url;
+            $invoice->due_date = $gatewayInvoice->dueDate;
+            $invoice->status = $gatewayInvoice->status;
+            $invoice->gateway_id = $gatewayInvoice->id;
+            $invoice->bank_slip_code = $gatewayInvoice->bankSlipCode;
+            $invoice->pix_code = $gatewayInvoice->pixCode;
+            $items = $gatewayInvoice->items;
+        } else {
+            $invoice->due_date = $data->dueDate;
+            $invoice->status = InvoiceStatus::PENDING();
+            $items = new GatewayInvoiceItemDTOCollection(
+                $data->items->map(static fn (InvoiceItemDTO $item) => GatewayInvoiceItemDTO::fromInvoiceItemDTO($item))
+            );
+        }
+
+        $invoice->gateway_slug = $this->gateway->getGatewayIdentifier();
+
+        $customer->invoices()->save($invoice);
+
+        $invoice->items()->createMany(
+            $items->map(fn (GatewayInvoiceItemDTO $item) => [
+                'gateway_id' => $item->id,
+                'gateway_slug' => $invoice->gateway_slug,
+                'price' => $item->price,
+                'quantity' => $item->quantity,
+                'description' => $item->description,
+            ])
+        );
+
+        return $invoice;
     }
 
     /**
