@@ -17,7 +17,7 @@ class RecipientFactory extends Factory
             'gateway_id' => $this->faker->uuid(),
             'gateway_slug' => 'mock',
             'name' => $this->faker->name(),
-            'document' => new Document($this->faker->cpf(), DocumentType::CNPJ()),
+            'document' => new Document($this->faker->cnpj(), DocumentType::CNPJ()),
         ];
     }
 }

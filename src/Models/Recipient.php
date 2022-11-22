@@ -13,6 +13,8 @@ use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
  * @property Document     $document
  * @property string       $document_number
  * @property DocumentType $document_type
+ * @property string|null  $gateway_id
+ * @property string       $gateway_slug
  */
 class Recipient extends AbstractModel
 {
