@@ -3,7 +3,6 @@
 namespace ValeSaude\PaymentGatewayClient\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Database\Factories\PaymentMethodFactory;
@@ -18,17 +17,13 @@ use ValeSaude\PaymentGatewayClient\ValueObjects\CreditCard;
  * @property CreditCard  $card
  * @property bool        $is_default
  * @property string      $customer_id
- * @property Customer    $customer
  */
-class PaymentMethod extends Model
+class PaymentMethod extends AbstractModel
 {
     use GeneratesUUIDOnInitializeTrait;
     use HasFactory;
 
-    public $incrementing = false;
     protected $table = 'payment_gateway_payment_methods';
-    protected $guarded = [];
-    protected $keyType = 'string';
 
     /**
      * @var array<string, mixed>
@@ -52,6 +47,7 @@ class PaymentMethod extends Model
 
     public function setAsDefault(): void
     {
+        // @phpstan-ignore-next-line
         $this->customer
             ->paymentMethods()
             ->update(['is_default' => false]);
