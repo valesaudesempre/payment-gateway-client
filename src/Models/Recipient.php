@@ -5,6 +5,7 @@ namespace ValeSaude\PaymentGatewayClient\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use ValeSaude\PaymentGatewayClient\Database\Factories\RecipientFactory;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
+use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
 use ValeSaude\PaymentGatewayClient\Recipient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
 
@@ -13,13 +14,12 @@ use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
  * @property Document     $document
  * @property string       $document_number
  * @property DocumentType $document_type
- * @property string|null  $gateway_id
- * @property string       $gateway_slug
  */
 class Recipient extends AbstractModel
 {
     use GeneratesUUIDOnInitializeTrait;
     use HasFactory;
+    use HasGatewayIdTrait;
 
     protected $table = 'payment_gateway_recipients';
 

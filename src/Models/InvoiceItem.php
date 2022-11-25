@@ -6,19 +6,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use ValeSaude\PaymentGatewayClient\Database\Factories\InvoiceItemFactory;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
+use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 /**
- * @property Money       $price
- * @property int         $quantity
- * @property string      $description
- * @property string|null $gateway_id
- * @property string      $gateway_slug
+ * @property Money  $price
+ * @property int    $quantity
+ * @property string $description
  */
 class InvoiceItem extends AbstractModel
 {
     use GeneratesUUIDOnInitializeTrait;
     use HasFactory;
+    use HasGatewayIdTrait;
 
     protected $table = 'payment_gateway_invoice_items';
 

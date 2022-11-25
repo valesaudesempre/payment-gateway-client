@@ -7,21 +7,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Database\Factories\PaymentMethodFactory;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
+use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
 use ValeSaude\PaymentGatewayClient\ValueObjects\CreditCard;
 
 /**
- * @property string      $id
- * @property string|null $gateway_id
- * @property string      $gateway_slug
- * @property string      $description
- * @property CreditCard  $card
- * @property bool        $is_default
- * @property string      $customer_id
+ * @property string     $id
+ * @property string     $description
+ * @property CreditCard $card
+ * @property bool       $is_default
+ * @property string     $customer_id
  */
 class PaymentMethod extends AbstractModel
 {
     use GeneratesUUIDOnInitializeTrait;
     use HasFactory;
+    use HasGatewayIdTrait;
 
     protected $table = 'payment_gateway_payment_methods';
 

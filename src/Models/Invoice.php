@@ -6,7 +6,6 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Carbon;
 use ValeSaude\PaymentGatewayClient\Casts\InvoicePaymentMethodCollectionCast;
 use ValeSaude\PaymentGatewayClient\Casts\InvoiceSplitRuleCollectionCast;
 use ValeSaude\PaymentGatewayClient\Collections\InvoiceSplitRuleCollection;
@@ -16,6 +15,7 @@ use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoicePaymentMethod;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoiceStatus;
 use ValeSaude\PaymentGatewayClient\Invoice\InvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
+use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 /**
@@ -31,13 +31,12 @@ use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
  * @property Money|null                     $refunded_amount
  * @property string|null                    $bank_slip_code
  * @property string|null                    $pix_code
- * @property string|null                    $gateway_id
- * @property string                         $gateway_slug
  */
 class Invoice extends AbstractModel
 {
     use GeneratesUUIDOnInitializeTrait;
     use HasFactory;
+    use HasGatewayIdTrait;
 
     protected $table = 'payment_gateway_invoices';
 
