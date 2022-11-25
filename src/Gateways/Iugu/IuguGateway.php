@@ -2,7 +2,7 @@
 
 namespace ValeSaude\PaymentGatewayClient\Gateways\Iugu;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
@@ -115,7 +115,7 @@ class IuguGateway extends AbstractGateway
             $response->json('id'),
             $response->json('secure_url'),
             // @phpstan-ignore-next-line
-            Carbon::make($response->json('due_date')),
+            CarbonImmutable::make($response->json('due_date')),
             AttributeConverter::convertIuguStatusToInvoiceStatus($response->json('status')),
             AttributeConverter::convertInvoiceItemsToGatewayInvoiceItemDTOCollection($response->json('items')),
             $response->json('bank_slip.digitable_line'),

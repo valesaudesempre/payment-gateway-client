@@ -1,6 +1,6 @@
 <?php
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
@@ -142,7 +142,7 @@ test('createInvoice POST to v1/invoices and returns GatewayInvoiceDTO on success
     // given
     $recipient = new Recipient(['gateway_id' => 'some-recipient-id']);
     $customerId = 'some-customer-id';
-    $dueDate = Carbon::now()->addWeek();
+    $dueDate = CarbonImmutable::now()->addWeek();
     $item1 = new InvoiceItemDTO(new Money(1000), 1, 'Item 1 description');
     $item2 = new InvoiceItemDTO(new Money(2000), 3, 'Item 2 description');
     $data = InvoiceBuilder::make()

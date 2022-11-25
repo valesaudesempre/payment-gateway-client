@@ -2,8 +2,8 @@
 
 namespace ValeSaude\PaymentGatewayClient\Database\Factories;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Carbon;
 use ValeSaude\PaymentGatewayClient\Collections\InvoiceSplitRuleCollection;
 use ValeSaude\PaymentGatewayClient\Invoice\Collections\InvoicePaymentMethodCollection;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoicePaymentMethod;
@@ -20,7 +20,7 @@ class InvoiceFactory extends Factory
         return [
             'gateway_id' => $this->faker->uuid(),
             'gateway_slug' => 'mock',
-            'due_date' => Carbon::now()->addWeek(),
+            'due_date' => CarbonImmutable::now()->addWeek(),
             'max_installments' => $this->faker->numberBetween(1, 12),
             'status' => InvoiceStatus::PENDING(),
             'available_payment_methods' => new InvoicePaymentMethodCollection(InvoicePaymentMethod::cases()),
