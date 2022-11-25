@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->string('document_type');
             $table->string('document_number');
             $table->timestamps();
+            $table->index(['gateway_id', 'gateway_slug']);
         });
     }
 
