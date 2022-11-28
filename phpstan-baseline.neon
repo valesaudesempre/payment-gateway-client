@@ -1,0 +1,31 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Method ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\Customer\\:\\:findUsingGatewayId\\(\\) should return static\\(ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\Customer\\)\\|null but returns ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\Customer\\|null\\.$#"
+			count: 1
+			path: src/Models/Customer.php
+
+		-
+			message: "#^Method ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\Invoice\\:\\:findUsingGatewayId\\(\\) should return static\\(ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\Invoice\\)\\|null but returns ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\Invoice\\|null\\.$#"
+			count: 1
+			path: src/Models/Invoice.php
+
+		-
+			message: "#^Method ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\InvoiceItem\\:\\:findUsingGatewayId\\(\\) should return static\\(ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\InvoiceItem\\)\\|null but returns ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\InvoiceItem\\|null\\.$#"
+			count: 1
+			path: src/Models/InvoiceItem.php
+
+		-
+			message: "#^Method ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\PaymentMethod\\:\\:findUsingGatewayId\\(\\) should return static\\(ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\PaymentMethod\\)\\|null but returns ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\PaymentMethod\\|null\\.$#"
+			count: 1
+			path: src/Models/PaymentMethod.php
+
+		-
+			message: "#^Method ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\Recipient\\:\\:findUsingGatewayId\\(\\) should return static\\(ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\Recipient\\)\\|null but returns ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\Recipient\\|null\\.$#"
+			count: 1
+			path: src/Models/Recipient.php
+
+		-
+			message: "#^Method ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\Webhook\\:\\:findUsingGatewayId\\(\\) should return static\\(ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\Webhook\\)\\|null but returns ValeSaude\\\\PaymentGatewayClient\\\\Models\\\\Webhook\\|null\\.$#"
+			count: 1
+			path: src/Models/Webhook.php

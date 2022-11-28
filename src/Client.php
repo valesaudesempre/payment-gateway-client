@@ -91,6 +91,7 @@ class Client
             );
 
             $invoice->url = $gatewayInvoice->url;
+            // @phpstan-ignore-next-line
             $invoice->due_date = $gatewayInvoice->dueDate;
             $invoice->status = $gatewayInvoice->status;
             $invoice->gateway_id = $gatewayInvoice->id;
@@ -98,6 +99,7 @@ class Client
             $invoice->pix_code = $gatewayInvoice->pixCode;
             $items = $gatewayInvoice->items;
         } else {
+            // @phpstan-ignore-next-line
             $invoice->due_date = $data->dueDate;
             $invoice->status = InvoiceStatus::PENDING();
             $items = new GatewayInvoiceItemDTOCollection(
