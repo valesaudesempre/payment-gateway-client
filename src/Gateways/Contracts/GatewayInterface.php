@@ -6,6 +6,8 @@ use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Customer\GatewayPaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Gateways\Enums\GatewayFeature;
+use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceDTO;
+use ValeSaude\PaymentGatewayClient\Invoice\InvoiceDTO;
 
 interface GatewayInterface
 {
@@ -18,6 +20,13 @@ interface GatewayInterface
         PaymentMethodDTO $data,
         bool $setAsDefault = true
     ): GatewayPaymentMethodDTO;
+
+    public function createInvoice(
+        ?string $customerId,
+        InvoiceDTO $data,
+        CustomerDTO $payer,
+        string $externalReference
+    ): GatewayInvoiceDTO;
 
     public function getGatewayIdentifier(): string;
 

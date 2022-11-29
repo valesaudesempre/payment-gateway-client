@@ -37,4 +37,16 @@ trait MocksGatewayMethodsTrait
             ->with($supportedFeature)
             ->willReturn($isSupported);
     }
+
+    /**
+     * @param array<string, bool>
+     */
+    public function mockGatewayMultipleSupportedFeatures(array $features): void
+    {
+        $this->gatewayMock
+            ->method('isFeatureSupported')
+            ->willReturnCallback(static function (GatewayFeature $feature) use ($features) {
+                return $features[$feature->value] ?? false;
+            });
+    }
 }

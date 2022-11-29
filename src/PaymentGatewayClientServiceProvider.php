@@ -15,7 +15,9 @@ class PaymentGatewayClientServiceProvider extends PackageServiceProvider
             ->hasMigrations(
                 '2022_11_17_190221_create_payment_gateway_customers_table',
                 '2022_11_18_180000_create_payment_gateway_payment_methods_table',
-                '2022_11_21_174730_create_payment_gateway_recipients_table'
+                '2022_11_21_174730_create_payment_gateway_recipients_table',
+                '2022_11_21_174731_create_payment_gateway_invoices_table',
+                '2022_11_21_174732_create_payment_gateway_invoice_items_table'
             )
             ->runsMigrations(true);
     }

@@ -45,6 +45,11 @@ class Customer extends AbstractModel
         return $this->hasMany(PaymentMethod::class);
     }
 
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
     public function updateUsingCustomerDTO(CustomerDTO $data): self
     {
         $this->update([

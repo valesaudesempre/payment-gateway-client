@@ -1,10 +1,17 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\IuguGateway;
+use ValeSaude\PaymentGatewayClient\Invoice\Builders\InvoiceBuilder;
+use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoicePaymentMethod;
+use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoiceStatus;
+use ValeSaude\PaymentGatewayClient\Invoice\InvoiceItemDTO;
+use ValeSaude\PaymentGatewayClient\Models\Recipient;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasCustomerHelperMethodsTrait;
+use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 uses(HasCustomerHelperMethodsTrait::class);
 
@@ -129,6 +136,115 @@ test('createPaymentMethod throws RequestException on HTTP error response', funct
     // when
     $this->sut->createPaymentMethod($customerId, $data);
 })->throws(RequestException::class);
+
+test('createInvoice POST to v1/invoices and returns GatewayInvoiceDTO on success', function () use ($baseUrl) {
+    // given
+    $recipient = new Recipient(['gateway_id' => 'some-recipient-id']);
+    $customerId = 'some-customer-id';
+    $dueDate = Carbon::now()->addWeek();
+    $item1 = new InvoiceItemDTO(new Money(1000), 1, 'Item 1 description');
+    $item2 = new InvoiceItemDTO(new Money(2000), 3, 'Item 2 description');
+    $data = InvoiceBuilder::make()
+        ->setDueDate($dueDate)
+        ->setMaxInstallments(12)
+        ->setAvailablePaymentMethods(
+            InvoicePaymentMethod::PIX(),
+            InvoicePaymentMethod::BANK_SLIP()
+        )
+        ->addItem($item1)
+        ->addItem($item2)
+        ->addSplit($recipient, new Money(500))
+        ->get();
+    $expectedExternalURL = 'https://some.url/some-invoice-id';
+    $expectedExternalId = 'some-external-id';
+    $payer = $this->createCustomerDTO();
+    Http::fake([
+        "{$baseUrl}/v1/invoices" => Http::response([
+            'id' => 'some-invoice-id',
+            'due_date' => $dueDate->toDateString(),
+            'status' => 'pending',
+            'secure_url' => $expectedExternalURL,
+            'pix' => [
+                'qrcode_text' => 'some-pix-code',
+            ],
+            'bank_slip' => [
+                'digitable_line' => 'some-bank-slip-code',
+            ],
+            'items' => [
+                [
+                    'id' => 'some-item-id-1',
+                    'description' => $item1->description,
+                    'price_cents' => $item1->price->getCents(),
+                    'quantity' => $item1->quantity,
+                ],
+                [
+                    'id' => 'some-item-id-2',
+                    'description' => $item2->description,
+                    'price_cents' => $item2->price->getCents(),
+                    'quantity' => $item2->quantity,
+                ],
+            ],
+        ]),
+    ]);
+
+    // when
+    $invoice = $this->sut->createInvoice($customerId, $data, $payer, $expectedExternalId);
+
+    // then
+    expect($invoice->id)->toEqual('some-invoice-id')
+        ->and($invoice->url)->toEqual($expectedExternalURL)
+        ->and($invoice->dueDate->toDateString())->toEqual($dueDate->toDateString())
+        ->and($invoice->status->equals(InvoiceStatus::PENDING()))->toBeTrue()
+        ->and($invoice->items->getItems()[0]->id)->toEqual('some-item-id-1')
+        ->and($invoice->items->getItems()[1]->id)->toEqual('some-item-id-2')
+        ->and($invoice->pixCode)->toEqual('some-pix-code')
+        ->and($invoice->bankSlipCode)->toEqual('some-bank-slip-code');
+    Http::assertSent(static function (Request $request) use ($payer, $customerId, $expectedExternalId, $data) {
+        $body = $request->data();
+        $expectedPayerPayload = [
+            'cpf_cnpj' => $payer->document->getNumber(),
+            'name' => $payer->name,
+            'email' => (string) $payer->email,
+            'address' => [
+                'zip_code' => (string) $payer->address->getZipCode(),
+                'street' => $payer->address->getStreet(),
+                'number' => $payer->address->getNumber(),
+                'district' => $payer->address->getDistrict(),
+                'city' => $payer->address->getCity(),
+                'state' => $payer->address->getState(),
+                'complement' => $payer->address->getComplement(),
+                'country' => 'Brasil',
+            ],
+        ];
+
+        if (data_get($request, 'payer') !== $expectedPayerPayload) {
+            return false;
+        }
+
+        $expectedItemsPayload = [
+            ['description' => 'Item 1 description', 'quantity' => 1, 'price_cents' => 1000],
+            ['description' => 'Item 2 description', 'quantity' => 3, 'price_cents' => 2000],
+        ];
+
+        if (data_get($request, 'items') !== $expectedItemsPayload) {
+            return false;
+        }
+
+        $expectedSplitsPayload = [
+            ['recipient_account_id' => 'some-recipient-id', 'cents' => 500],
+        ];
+
+        if (data_get($request, 'splits') !== $expectedSplitsPayload) {
+            return false;
+        }
+
+        return data_get($body, 'customer_id') === $customerId &&
+            data_get($body, 'due_date') === $data->dueDate->toDateString() &&
+            data_get($body, 'max_installments_value') === $data->maxInstallments &&
+            data_get($body, 'payable_with') === ['pix', 'bank_slip'] &&
+            data_get($body, 'external_reference') === $expectedExternalId;
+    });
+});
 
 test('getGatewayIdentifier returns expected identifier', function () {
     // when
