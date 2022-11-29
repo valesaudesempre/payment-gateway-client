@@ -28,4 +28,9 @@ class InvoiceFactory extends Factory
             'customer_id' => Customer::factory(),
         ];
     }
+
+    public function paid(): self
+    {
+        return $this->state(['status' => InvoiceStatus::PAID()]);
+    }
 }

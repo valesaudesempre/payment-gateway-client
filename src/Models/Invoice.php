@@ -76,10 +76,29 @@ class Invoice extends AbstractModel
 
     public function markAsPaid(): void
     {
-        $this->update([
-            'status' => InvoiceStatus::PAID(),
-            'paid_at' => CarbonImmutable::now(),
-        ]);
+        $this->status = InvoiceStatus::PAID();
+        $this->paid_at = CarbonImmutable::now();
+        $this->save();
+    }
+
+    public function markAsCanceled(): void
+    {
+        $this->status = InvoiceStatus::CANCELED();
+        $this->canceled_at = CarbonImmutable::now();
+        $this->save();
+    }
+
+    public function markAsRefunded(Money $refundedAmount): void
+    {
+        $this->status = InvoiceStatus::REFUNDED();
+        $this->refunded_at = CarbonImmutable::now();
+        $this->refunded_amount = $refundedAmount;
+        $this->save();
+    }
+
+    public function setStatus(InvoiceStatus $status): void
+    {
+        $this->update(compact('status'));
     }
 
     public static function fromInvoiceDTO(InvoiceDTO $data): self
