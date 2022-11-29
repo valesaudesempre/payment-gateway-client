@@ -2,24 +2,13 @@
 
 namespace ValeSaude\PaymentGatewayClient\Casts;
 
-use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Contracts\StringableValueObjectInterface;
 
-class StringableValueObjectCast implements CastsAttributes
+/**
+ * @template-extends AbstractValueObjectCast<StringableValueObjectInterface>
+ */
+class StringableValueObjectCast extends AbstractValueObjectCast
 {
-    /**
-     * @var class-string<StringableValueObjectInterface>
-     */
-    private string $valueObjectClass;
-
-    /**
-     * @param class-string<StringableValueObjectInterface> $valueObjectClass
-     */
-    public function __construct(string $valueObjectClass)
-    {
-        $this->valueObjectClass = $valueObjectClass;
-    }
-
     /**
      * @param string               $value
      * @param array<string, mixed> $attributes

@@ -77,6 +77,59 @@ test('updateCustomer PUT to /v1/customers/{id}', function () use ($baseUrl) {
     });
 });
 
+test('updateCustomer throws RequestException on HTTP error response', function () use ($baseUrl) {
+    // given
+    $expectedExternalId = 'some-external-id';
+    $data = $this->createCustomerDTO();
+    Http::fake(["{$baseUrl}/v1/customers/{$expectedExternalId}" => Http::response(null, 400)]);
+
+    // when
+    $this->sut->updateCustomer($expectedExternalId, $data);
+})->throws(RequestException::class);
+
+test('createPaymentMethod POST to v1/customers/{customer_id}/payment_methods and returns GatewayPaymentMethodDTO on success', function () use ($baseUrl) {
+    // given
+    $customerId = 'some-customer-id';
+    $expectedExternalId = 'some-external-id';
+    $creditCard = $this->createCreditCard();
+    $data = $this->createPaymentMethodDTO();
+    Http::fake([
+        "{$baseUrl}/v1/customers/{$customerId}/payment_methods" => Http::response([
+            'id' => $expectedExternalId,
+            'data' => [
+                'holder_name' => $creditCard->getHolderName(),
+                'display_number' => $creditCard->getNumber(),
+                'brand' => $creditCard->getBrand(),
+                'month' => $creditCard->getExpirationMonth()->getValue(),
+                'year' => $creditCard->getExpirationYear()->getValue(),
+            ],
+        ]),
+    ]);
+
+    // when
+    $paymentMethod = $this->sut->createPaymentMethod($customerId, $data);
+
+    // then
+    expect($paymentMethod->id)->toEqual($expectedExternalId)
+        ->and($paymentMethod->card)->toEqual($creditCard);
+    Http::assertSent(static function (Request $request) use ($data) {
+        $body = $request->data();
+
+        return data_get($body, 'description') === $data->description &&
+            data_get($body, 'token') === $data->token;
+    });
+});
+
+test('createPaymentMethod throws RequestException on HTTP error response', function () use ($baseUrl) {
+    // given
+    $customerId = 'some-customer-id';
+    $data = $this->createPaymentMethodDTO();
+    Http::fake(["{$baseUrl}/v1/customers/{$customerId}/payment_methods" => Http::response(null, 400)]);
+
+    // when
+    $this->sut->createPaymentMethod($customerId, $data);
+})->throws(RequestException::class);
+
 test('getGatewayIdentifier returns expected identifier', function () {
     // when
     $identifier = $this->sut->getGatewayIdentifier();

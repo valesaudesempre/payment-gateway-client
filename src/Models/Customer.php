@@ -4,6 +4,7 @@ namespace ValeSaude\PaymentGatewayClient\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Database\Factories\CustomerFactory;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
@@ -11,6 +12,15 @@ use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
 use ValeSaude\PaymentGatewayClient\ValueObjects\CPF;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Email;
 
+/**
+ * @property string      $id
+ * @property string      $name
+ * @property CPF         $document_number
+ * @property Email       $email
+ * @property Address     $address
+ * @property string|null $gateway_id
+ * @property string      $gateway_slug
+ */
 class Customer extends Model
 {
     use GeneratesUUIDOnInitializeTrait;
@@ -29,6 +39,11 @@ class Customer extends Model
         'email' => Email::class,
         'address' => Address::class,
     ];
+
+    public function paymentMethods(): HasMany
+    {
+        return $this->hasMany(PaymentMethod::class);
+    }
 
     public function updateUsingCustomerDTO(CustomerDTO $data): self
     {

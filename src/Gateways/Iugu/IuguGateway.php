@@ -7,8 +7,13 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
+use ValeSaude\PaymentGatewayClient\Customer\GatewayPaymentMethodDTO;
+use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Gateways\AbstractGateway;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Builders\IuguCustomerBuilder;
+use ValeSaude\PaymentGatewayClient\ValueObjects\CreditCard;
+use ValeSaude\PaymentGatewayClient\ValueObjects\Month;
+use ValeSaude\PaymentGatewayClient\ValueObjects\PositiveInteger;
 
 class IuguGateway extends AbstractGateway
 {
@@ -47,6 +52,33 @@ class IuguGateway extends AbstractGateway
             IuguCustomerBuilder::make()
                 ->fromCustomerDTO($data)
                 ->get()
+        );
+    }
+
+    public function createPaymentMethod(
+        string $customerId,
+        PaymentMethodDTO $data,
+        bool $setAsDefault = true
+    ): GatewayPaymentMethodDTO {
+        $response = $this->doRequest(
+            'POST',
+            "v1/customers/{$customerId}/payment_methods",
+            [
+                'description' => $data->description,
+                'token' => $data->token,
+                'set_as_default' => $setAsDefault,
+            ]
+        );
+
+        return new GatewayPaymentMethodDTO(
+            $response->json('id'),
+            new CreditCard(
+                $response->json('data.holder_name'),
+                $response->json('data.display_number'),
+                $response->json('data.brand'),
+                new Month($response->json('data.month')),
+                new PositiveInteger($response->json('data.year'))
+            )
         );
     }
 

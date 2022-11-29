@@ -9,7 +9,7 @@ abstract class AbstractIuguBuilder
      */
     protected array $properties;
 
-    protected function __construct()
+    final protected function __construct()
     {
         $this->properties = [];
     }
