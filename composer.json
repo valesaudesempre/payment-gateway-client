@@ -48,6 +48,13 @@
             "phpstan/extension-installer": true
         }
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ValeSaude\\PaymentGatewayClient\\PaymentGatewayClientServiceProvider"
+            ]
+        }
+    },
     "scripts": {
         "analyse": "phpstan analyze",
         "test": "pest",
