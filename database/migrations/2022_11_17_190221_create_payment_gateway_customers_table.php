@@ -17,6 +17,7 @@ return new class() extends Migration {
             $table->string('email');
             $table->json('address');
             $table->timestamps();
+            $table->index(['gateway_id', 'gateway_slug']);
         });
     }
 

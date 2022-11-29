@@ -2,7 +2,7 @@
 
 namespace ValeSaude\PaymentGatewayClient\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,28 +15,28 @@ use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoicePaymentMethod;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoiceStatus;
 use ValeSaude\PaymentGatewayClient\Invoice\InvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
+use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 /**
  * @property string|null                    $url
- * @property Carbon                         $due_date
+ * @property CarbonImmutable                $due_date
  * @property InvoicePaymentMethodCollection $available_payment_methods
  * @property int                            $max_installments
  * @property InvoiceStatus                  $status
  * @property Money                          $total
- * @property Carbon|null                    $paid_at
- * @property Carbon|null                    $canceled_at
- * @property Carbon|null                    $refunded_at
+ * @property CarbonImmutable|null           $paid_at
+ * @property CarbonImmutable|null           $canceled_at
+ * @property CarbonImmutable|null           $refunded_at
  * @property Money|null                     $refunded_amount
  * @property string|null                    $bank_slip_code
  * @property string|null                    $pix_code
- * @property string|null                    $gateway_id
- * @property string                         $gateway_slug
  */
 class Invoice extends AbstractModel
 {
     use GeneratesUUIDOnInitializeTrait;
     use HasFactory;
+    use HasGatewayIdTrait;
 
     protected $table = 'payment_gateway_invoices';
 
@@ -44,14 +44,14 @@ class Invoice extends AbstractModel
      * @var array<string, class-string|string>
      */
     protected $casts = [
-        'due_date' => 'date',
+        'due_date' => 'immutable_date',
         'max_installments' => 'int',
         'status' => InvoiceStatus::class,
         'available_payment_methods' => InvoicePaymentMethodCollectionCast::class,
         'splits' => InvoiceSplitRuleCollectionCast::class,
-        'paid_at' => 'datetime',
-        'canceled_at' => 'datetime',
-        'refunded_at' => 'datetime',
+        'paid_at' => 'immutable_datetime',
+        'canceled_at' => 'immutable_datetime',
+        'refunded_at' => 'immutable_datetime',
         'refunded_amount' => Money::class,
     ];
 
@@ -78,7 +78,7 @@ class Invoice extends AbstractModel
     {
         $this->update([
             'status' => InvoiceStatus::PAID(),
-            'paid_at' => Carbon::now(),
+            'paid_at' => CarbonImmutable::now(),
         ]);
     }
 

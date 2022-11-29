@@ -2,7 +2,7 @@
 
 namespace ValeSaude\PaymentGatewayClient\Invoice;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use ValeSaude\PaymentGatewayClient\Invoice\Collections\GatewayInvoiceItemDTOCollection;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoiceStatus;
 
@@ -10,7 +10,7 @@ class GatewayInvoiceDTO
 {
     public string $id;
     public ?string $url;
-    public Carbon $dueDate;
+    public CarbonInterface $dueDate;
     public InvoiceStatus $status;
     public GatewayInvoiceItemDTOCollection $items;
     public ?string $bankSlipCode;
@@ -19,7 +19,7 @@ class GatewayInvoiceDTO
     public function __construct(
         string $id,
         string $url,
-        Carbon $dueDate,
+        CarbonInterface $dueDate,
         InvoiceStatus $status,
         GatewayInvoiceItemDTOCollection $items,
         ?string $bankSlipCode = null,

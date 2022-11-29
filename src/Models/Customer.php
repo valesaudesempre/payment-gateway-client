@@ -7,26 +7,25 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Database\Factories\CustomerFactory;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
+use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
 use ValeSaude\PaymentGatewayClient\Recipient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Email;
 
 /**
- * @property string       $id
  * @property string       $name
  * @property Document     $document
  * @property string       $document_number
  * @property DocumentType $document_type
  * @property Email        $email
  * @property Address      $address
- * @property string|null  $gateway_id
- * @property string       $gateway_slug
  */
 class Customer extends AbstractModel
 {
     use GeneratesUUIDOnInitializeTrait;
     use HasFactory;
+    use HasGatewayIdTrait;
 
     protected $table = 'payment_gateway_customers';
 

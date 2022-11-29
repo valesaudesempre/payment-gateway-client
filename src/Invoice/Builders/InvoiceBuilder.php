@@ -2,7 +2,8 @@
 
 namespace ValeSaude\PaymentGatewayClient\Invoice\Builders;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use ValeSaude\PaymentGatewayClient\Collections\InvoiceSplitRuleCollection;
 use ValeSaude\PaymentGatewayClient\Invoice\Collections\InvoiceItemDTOCollection;
 use ValeSaude\PaymentGatewayClient\Invoice\Collections\InvoicePaymentMethodCollection;
@@ -15,7 +16,7 @@ use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 class InvoiceBuilder
 {
-    private Carbon $dueDate;
+    private CarbonInterface $dueDate;
     private int $maxInstallments;
     private InvoicePaymentMethodCollection $availablePaymentMethods;
     private InvoiceSplitRuleCollection $splits;
@@ -23,14 +24,14 @@ class InvoiceBuilder
 
     private function __construct()
     {
-        $this->dueDate = Carbon::today();
+        $this->dueDate = CarbonImmutable::today();
         $this->maxInstallments = 1;
         $this->availablePaymentMethods = new InvoicePaymentMethodCollection(InvoicePaymentMethod::cases());
         $this->splits = new InvoiceSplitRuleCollection();
         $this->items = new InvoiceItemDTOCollection();
     }
 
-    public function setDueDate(Carbon $dueDate): self
+    public function setDueDate(CarbonInterface $dueDate): self
     {
         $this->dueDate = $dueDate;
 

@@ -1,6 +1,6 @@
 <?php
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use ValeSaude\PaymentGatewayClient\Client;
 use ValeSaude\PaymentGatewayClient\Customer\GatewayPaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Exceptions\UnsupportedFeatureException;
@@ -176,7 +176,7 @@ test('createInvoice creates an invoice using its gateway and returns and Invoice
         ->add($item1)
         ->add($item2);
     $data = InvoiceBuilder::make()
-        ->setDueDate(Carbon::now()->addWeek())
+        ->setDueDate(CarbonImmutable::now()->addWeek())
         ->setMaxInstallments(12)
         ->setAvailablePaymentMethods(InvoicePaymentMethod::CREDIT_CARD())
         ->addItem(InvoiceItemDTO::fromGatewayInvoiceItemDTO($item1))
@@ -256,7 +256,7 @@ test('createInvoice creates an Invoice internally and returns when gateway does 
     // given
     $customer = Customer::factory()->create();
     $data = InvoiceBuilder::make()
-        ->setDueDate(Carbon::now()->addWeek())
+        ->setDueDate(CarbonImmutable::now()->addWeek())
         ->setMaxInstallments(12)
         ->addItem(new InvoiceItemDTO(new Money(1000), 1, 'Item 1 description'))
         ->addItem(new InvoiceItemDTO(new Money(2000), 3, 'Item 2 description'))
@@ -313,7 +313,7 @@ test('chargeInvoiceUsingPaymentMethod charges an invoice using its gateway and r
 
     // then
     expect($invoice->status->equals(InvoiceStatus::PAID()))->toBeTrue()
-        ->and($invoice->paid_at->toDateString())->toEqual(Carbon::today()->toDateString());
+        ->and($invoice->paid_at->toDateString())->toEqual(CarbonImmutable::today()->toDateString());
 });
 
 test('chargeInvoiceUsingPaymentMethod charges using the default Customer payment method when none is provided', function () {
@@ -335,7 +335,7 @@ test('chargeInvoiceUsingPaymentMethod charges using the default Customer payment
 
     // then
     expect($invoice->status->equals(InvoiceStatus::PAID()))->toBeTrue()
-        ->and($invoice->paid_at->toDateString())->toEqual(Carbon::today()->toDateString());
+        ->and($invoice->paid_at->toDateString())->toEqual(CarbonImmutable::today()->toDateString());
 });
 
 test('chargeInvoiceUsingPaymentMethod throws when no payment method is provided and Customer does not have a default one', function () {
@@ -365,5 +365,5 @@ test('chargeInvoiceUsingToken charges an invoice using its gateway and returns t
 
     // then
     expect($invoice->status->equals(InvoiceStatus::PAID()))->toBeTrue()
-        ->and($invoice->paid_at->toDateString())->toEqual(Carbon::today()->toDateString());
+        ->and($invoice->paid_at->toDateString())->toEqual(CarbonImmutable::today()->toDateString());
 });

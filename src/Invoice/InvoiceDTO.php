@@ -2,21 +2,21 @@
 
 namespace ValeSaude\PaymentGatewayClient\Invoice;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use ValeSaude\PaymentGatewayClient\Collections\InvoiceSplitRuleCollection;
 use ValeSaude\PaymentGatewayClient\Invoice\Collections\InvoiceItemDTOCollection;
 use ValeSaude\PaymentGatewayClient\Invoice\Collections\InvoicePaymentMethodCollection;
 
 class InvoiceDTO
 {
-    public Carbon $dueDate;
+    public CarbonInterface $dueDate;
     public InvoiceItemDTOCollection $items;
     public int $maxInstallments = 1;
     public ?InvoicePaymentMethodCollection $availablePaymentMethods;
     public ?InvoiceSplitRuleCollection $splits;
 
     public function __construct(
-        Carbon $dueDate,
+        CarbonInterface $dueDate,
         InvoiceItemDTOCollection $items,
         int $maxInstallments,
         ?InvoicePaymentMethodCollection $availablePaymentMethods = null,
