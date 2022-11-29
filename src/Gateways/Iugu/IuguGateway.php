@@ -11,6 +11,7 @@ use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Customer\GatewayPaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Gateways\AbstractGateway;
+use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\TransactionDeclinedException;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Builders\IuguCustomerBuilder;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Builders\IuguInvoiceBuilder;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Exceptions\GenericErrorResponseException;
@@ -120,6 +121,39 @@ class IuguGateway extends AbstractGateway
             $response->json('bank_slip.digitable_line'),
             $response->json('pix.qrcode_text')
         );
+    }
+
+    public function chargeInvoiceUsingPaymentMethod(string $invoiceId, string $customerId, string $paymentMethodId): void
+    {
+        $response = $this->doRequest(
+            'POST',
+            'v1/charge',
+            [
+                'invoice_id' => $invoiceId,
+                'customer_id' => $customerId,
+                'customer_payment_method_id' => $paymentMethodId,
+            ]
+        );
+
+        if (!$response->json('success')) {
+            throw TransactionDeclinedException::withLR($response->json('LR'));
+        }
+    }
+
+    public function chargeInvoiceUsingToken(string $invoiceId, string $token): void
+    {
+        $response = $this->doRequest(
+            'POST',
+            'v1/charge',
+            [
+                'invoice_id' => $invoiceId,
+                'token' => $token,
+            ]
+        );
+
+        if (!$response->json('success')) {
+            throw TransactionDeclinedException::withLR($response->json('LR'));
+        }
     }
 
     public function getGatewayIdentifier(): string
