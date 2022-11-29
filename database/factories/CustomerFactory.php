@@ -4,8 +4,9 @@ namespace ValeSaude\PaymentGatewayClient\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use ValeSaude\PaymentGatewayClient\Models\Customer;
+use ValeSaude\PaymentGatewayClient\Recipient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
-use ValeSaude\PaymentGatewayClient\ValueObjects\CPF;
+use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Email;
 use ValeSaude\PaymentGatewayClient\ValueObjects\ZipCode;
 
@@ -19,7 +20,7 @@ class CustomerFactory extends Factory
             'gateway_id' => $this->faker->uuid(),
             'gateway_slug' => 'mock',
             'name' => $this->faker->name(),
-            'document_number' => new CPF($this->faker->cpf()),
+            'document' => new Document($this->faker->cpf(), DocumentType::CPF()),
             'email' => new Email($this->faker->unique()->safeEmail()),
             'address' => new Address(
                 new ZipCode($this->faker->numerify('########')),

@@ -11,7 +11,7 @@ class IuguCustomerBuilder extends AbstractIuguBuilder
         $this->properties = array_merge($this->properties, [
             'email' => (string) $data->email,
             'name' => $data->name,
-            'cpf_cnpj' => (string) $data->documentNumber,
+            'cpf_cnpj' => $data->document->getNumber(),
             'zip_code' => (string) $data->address->getZipCode(),
             'number' => $data->address->getNumber(),
             'street' => $data->address->getStreet(),

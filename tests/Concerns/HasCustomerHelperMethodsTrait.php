@@ -43,7 +43,7 @@ trait HasCustomerHelperMethodsTrait
     {
         expect($customer->name)->toEqual($data->name)
             ->and($customer->email)->toEqual($data->email)
-            ->and($customer->document_number)->toEqual($data->documentNumber)
+            ->and($customer->document)->toEqual($data->document)
             ->and($customer->address)->toEqual($data->address);
     }
 }
