@@ -8,7 +8,7 @@ return new class() extends Migration {
     public function up(): void
     {
         Schema::create('payment_gateway_payment_methods', static function (Blueprint $table) {
-            $table->uuid('id');
+            $table->uuid('id')->primary();
             $table->string('gateway_id')->nullable();
             $table->string('gateway_slug');
             $table->string('description');
