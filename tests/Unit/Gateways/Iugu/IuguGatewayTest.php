@@ -12,7 +12,7 @@ $baseUrl = 'https://some.url';
 
 beforeEach(fn () => $this->sut = new IuguGateway($baseUrl, 'some-api-key'));
 
-test('createCustomer returns external id on success', function () use ($baseUrl) {
+test('createCustomer POST to /v1/customers and returns external id on success', function () use ($baseUrl) {
     // given
     $expectedExternalId = 'some-external-id';
     $expectedInternalId = 'some-internal-id';
@@ -50,6 +50,32 @@ test('createCustomer throws RequestException on HTTP error response', function (
     // when
     $this->sut->createCustomer($data, 'some-internal-id');
 })->throws(RequestException::class);
+
+test('updateCustomer PUT to /v1/customers/{id}', function () use ($baseUrl) {
+    // given
+    $expectedExternalId = 'some-external-id';
+    $data = $this->createCustomerDTO();
+    Http::fake(["{$baseUrl}/v1/customers/{$expectedExternalId}" => Http::response()]);
+
+    // when
+    $this->sut->updateCustomer($expectedExternalId, $data);
+
+    // then
+    Http::assertSent(static function (Request $request) use ($data) {
+        $body = $request->data();
+
+        return data_get($body, 'email') === (string) $data->email &&
+            data_get($body, 'name') === $data->name &&
+            data_get($body, 'cpf_cnpj') === (string) $data->documentNumber &&
+            data_get($body, 'zip_code') === (string) $data->address->getZipCode() &&
+            data_get($body, 'number') === $data->address->getNumber() &&
+            data_get($body, 'street') === $data->address->getStreet() &&
+            data_get($body, 'city') === $data->address->getCity() &&
+            data_get($body, 'state') === $data->address->getState() &&
+            data_get($body, 'district') === $data->address->getDistrict() &&
+            data_get($body, 'complement') === $data->address->getComplement();
+    });
+});
 
 test('getGatewayIdentifier returns expected identifier', function () {
     // when

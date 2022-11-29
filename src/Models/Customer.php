@@ -2,19 +2,19 @@
 
 namespace ValeSaude\PaymentGatewayClient\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
+use ValeSaude\PaymentGatewayClient\Database\Factories\CustomerFactory;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
 use ValeSaude\PaymentGatewayClient\ValueObjects\CPF;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Email;
 
-/**
- *
- */
 class Customer extends Model
 {
     use GeneratesUUIDOnInitializeTrait;
+    use HasFactory;
 
     public $incrementing = false;
     protected $table = 'payment_gateway_customers';
@@ -29,6 +29,18 @@ class Customer extends Model
         'email' => Email::class,
         'address' => Address::class,
     ];
+
+    public function updateUsingCustomerDTO(CustomerDTO $data): self
+    {
+        $this->update([
+            'name' => $data->name,
+            'email' => $data->email,
+            'document_number' => $data->documentNumber,
+            'address' => $data->address,
+        ]);
+
+        return $this;
+    }
 
     public function toCustomerDTO(): CustomerDTO
     {
@@ -48,5 +60,10 @@ class Customer extends Model
             'document_number' => $data->documentNumber,
             'address' => $data->address,
         ]);
+    }
+
+    protected static function newFactory(): CustomerFactory
+    {
+        return CustomerFactory::new();
     }
 }

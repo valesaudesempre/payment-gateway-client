@@ -9,7 +9,7 @@ return new class() extends Migration {
     {
         Schema::create('payment_gateway_customers', static function (Blueprint $table) {
             $table->uuid('id');
-            $table->string('gateway_id');
+            $table->string('gateway_id')->nullable();
             $table->string('gateway_slug');
             $table->string('name');
             $table->string('document_number');

@@ -7,9 +7,10 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
-use ValeSaude\PaymentGatewayClient\Gateways\Contracts\GatewayInterface;
+use ValeSaude\PaymentGatewayClient\Gateways\AbstractGateway;
+use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Builders\IuguCustomerBuilder;
 
-class IuguGateway implements GatewayInterface
+class IuguGateway extends AbstractGateway
 {
     private string $baseUrl;
     private string $apiKey;
@@ -23,33 +24,30 @@ class IuguGateway implements GatewayInterface
     /**
      * @throws RequestException
      */
-    public function createCustomer(CustomerDTO $data, string $internalId): string
+    public function createCustomer(CustomerDTO $data, string $externalReference): string
     {
         $response = $this
             ->doRequest(
                 'POST',
                 'v1/customers',
-                [
-                    'email' => (string) $data->email,
-                    'name' => $data->name,
-                    'cpf_cnpj' => (string) $data->documentNumber,
-                    'zip_code' => (string) $data->address->getZipCode(),
-                    'number' => $data->address->getNumber(),
-                    'street' => $data->address->getStreet(),
-                    'city' => $data->address->getCity(),
-                    'state' => $data->address->getState(),
-                    'district' => $data->address->getDistrict(),
-                    'complement' => $data->address->getComplement(),
-                    'custom_variables' => [
-                        [
-                            'name' => 'external_reference',
-                            'value' => $internalId,
-                        ],
-                    ],
-                ]
+                IuguCustomerBuilder::make()
+                    ->fromCustomerDTO($data)
+                    ->setExternalReference($externalReference)
+                    ->get()
             );
 
         return $response->json('id');
+    }
+
+    public function updateCustomer(string $id, CustomerDTO $data): void
+    {
+        $this->doRequest(
+            'PUT',
+            "v1/customers/{$id}",
+            IuguCustomerBuilder::make()
+                ->fromCustomerDTO($data)
+                ->get()
+        );
     }
 
     public function getGatewayIdentifier(): string
