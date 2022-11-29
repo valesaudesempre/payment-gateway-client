@@ -5,6 +5,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\TransactionDeclinedException;
+use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Exceptions\GenericErrorResponseException;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\IuguGateway;
 use ValeSaude\PaymentGatewayClient\Invoice\Builders\InvoiceBuilder;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoicePaymentMethod;
@@ -278,6 +279,17 @@ test('chargeInvoiceUsingPaymentMethod throws TransactionDeclinedException when a
     'Transaction declined with LR 01.'
 );
 
+test('chargeInvoiceUsingPaymentMethod throws GenericErrorResponseException on HTTP success containing errors property', function () use ($baseUrl) {
+    // given
+    Http::fake(["{$baseUrl}/v1/charge" => Http::response(['errors' => 'Some error'])]);
+
+    // when
+    $this->sut->chargeInvoiceUsingPaymentMethod('some-invoice-id', 'some-customer-id', 'some-payment-method-id');
+})->throws(
+    GenericErrorResponseException::class,
+    'There was an error during the request.'
+);
+
 test('chargeInvoiceUsingPaymentMethod throws RequestException on HTTP error response', function () use ($baseUrl) {
     // given
     Http::fake(["{$baseUrl}/v1/charge" => Http::response(null, 400)]);
@@ -313,6 +325,17 @@ test('chargeInvoiceUsingToken throws TransactionDeclinedException when authoriza
 })->throws(
     TransactionDeclinedException::class,
     'Transaction declined with LR 01.'
+);
+
+test('chargeInvoiceUsingToken throws GenericErrorResponseException on HTTP success containing errors property', function () use ($baseUrl) {
+    // given
+    Http::fake(["{$baseUrl}/v1/charge" => Http::response(['errors' => 'Some error'])]);
+
+    // when
+    $this->sut->chargeInvoiceUsingToken('some-invoice-id', 'some-token');
+})->throws(
+    GenericErrorResponseException::class,
+    'There was an error during the request.'
 );
 
 test('chargeInvoiceUsingToken throws RequestException on HTTP error response', function () use ($baseUrl) {

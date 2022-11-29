@@ -5,6 +5,7 @@ namespace ValeSaude\PaymentGatewayClient\Gateways\Iugu;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
@@ -136,7 +137,13 @@ class IuguGateway extends AbstractGateway
         );
 
         if (!$response->json('success')) {
-            throw TransactionDeclinedException::withLR($response->json('LR'));
+            if ($response->json('LR')) {
+                throw TransactionDeclinedException::withLR($response->json('LR'));
+            }
+
+            // Por alguma razão, o Iugu retorna 200 mesmo quando ocorre um erro do tipo "esse token já foi usado"
+            // Devido a isso, precisamos tratar também os "sucessos" como um possível erro
+            $this->handleErrors($response);
         }
     }
 
@@ -152,7 +159,13 @@ class IuguGateway extends AbstractGateway
         );
 
         if (!$response->json('success')) {
-            throw TransactionDeclinedException::withLR($response->json('LR'));
+            if ($response->json('LR')) {
+                throw TransactionDeclinedException::withLR($response->json('LR'));
+            }
+
+            // Por alguma razão, o Iugu retorna 200 mesmo quando ocorre um erro do tipo "esse token já foi usado"
+            // Devido a isso, precisamos tratar também os "sucessos" como um possível erro
+            $this->handleErrors($response);
         }
     }
 
@@ -166,7 +179,7 @@ class IuguGateway extends AbstractGateway
      *
      * @throws RequestException
      */
-    protected function doRequest(string $method, string $uri, array $data = [], bool $throwOnError = true): Response
+    public function doRequest(string $method, string $uri, array $data = [], bool $throwOnError = true): Response
     {
         $pendingRequest = Http
             ::asJson()
@@ -199,6 +212,8 @@ class IuguGateway extends AbstractGateway
         if (empty($errors)) {
             $response->throw();
         }
+
+        $errors = Arr::wrap($errors);
 
         if (422 === $response->status()) {
             throw ValidationErrorResponseException::withErrors($errors);
