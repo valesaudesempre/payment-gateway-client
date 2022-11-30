@@ -6,6 +6,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Query\Builder;
 use ValeSaude\PaymentGatewayClient\Casts\InvoicePaymentMethodCollectionCast;
 use ValeSaude\PaymentGatewayClient\Casts\InvoiceSplitRuleCollectionCast;
 use ValeSaude\PaymentGatewayClient\Collections\InvoiceSplitRuleCollection;
@@ -16,6 +17,7 @@ use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoiceStatus;
 use ValeSaude\PaymentGatewayClient\Invoice\InvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
+use ValeSaude\PaymentGatewayClient\QueryBuilders\InvoiceQueryBuilder;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 /**
@@ -31,6 +33,8 @@ use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
  * @property Money|null                     $refunded_amount
  * @property string|null                    $bank_slip_code
  * @property string|null                    $pix_code
+ *
+ * @method static InvoiceQueryBuilder query()
  */
 class Invoice extends AbstractModel
 {
@@ -62,6 +66,14 @@ class Invoice extends AbstractModel
         );
 
         return new Money($total);
+    }
+
+    /**
+     * @param Builder $query
+     */
+    public function newEloquentBuilder($query): InvoiceQueryBuilder
+    {
+        return new InvoiceQueryBuilder($query);
     }
 
     public function customer(): BelongsTo

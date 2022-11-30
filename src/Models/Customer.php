@@ -4,10 +4,12 @@ namespace ValeSaude\PaymentGatewayClient\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Query\Builder;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Database\Factories\CustomerFactory;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
+use ValeSaude\PaymentGatewayClient\QueryBuilders\CustomerQueryBuilder;
 use ValeSaude\PaymentGatewayClient\Recipient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
@@ -20,6 +22,8 @@ use ValeSaude\PaymentGatewayClient\ValueObjects\Email;
  * @property DocumentType $document_type
  * @property Email        $email
  * @property Address      $address
+ *
+ * @method static CustomerQueryBuilder query()
  */
 class Customer extends AbstractModel
 {
@@ -38,6 +42,14 @@ class Customer extends AbstractModel
         'email' => Email::class,
         'address' => Address::class,
     ];
+
+    /**
+     * @param Builder $query
+     */
+    public function newEloquentBuilder($query): CustomerQueryBuilder
+    {
+        return new CustomerQueryBuilder($query);
+    }
 
     public function paymentMethods(): HasMany
     {
