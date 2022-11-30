@@ -3,6 +3,7 @@
 namespace ValeSaude\PaymentGatewayClient;
 
 use InvalidArgumentException;
+use ValeSaude\PaymentGatewayClient\Contracts\ClientInterface;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Exceptions\UnsupportedFeatureException;
@@ -17,13 +18,13 @@ use ValeSaude\PaymentGatewayClient\Models\Customer;
 use ValeSaude\PaymentGatewayClient\Models\Invoice;
 use ValeSaude\PaymentGatewayClient\Models\PaymentMethod;
 
-class Client
+class Client implements ClientInterface
 {
     private GatewayInterface $gateway;
 
-    public function __construct(GatewayInterface $client)
+    public function __construct(GatewayInterface $gateway)
     {
-        $this->gateway = $client;
+        $this->gateway = $gateway;
     }
 
     public function createCustomer(CustomerDTO $data): Customer
@@ -168,5 +169,10 @@ class Client
                 $this->gateway->getGatewayIdentifier()
             );
         }
+    }
+
+    public function getGateway(): GatewayInterface
+    {
+        return $this->gateway;
     }
 }

@@ -7,3 +7,6 @@ parameters:
         - src
     tmpDir: build/phpstan
     checkModelProperties: true
+    excludePaths:
+        - src/FakeClient.php
+        - src/Gateways/Fake/FakeGateway.php

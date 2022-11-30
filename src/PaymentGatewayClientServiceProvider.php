@@ -4,6 +4,7 @@ namespace ValeSaude\PaymentGatewayClient;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use ValeSaude\PaymentGatewayClient\Contracts\ClientInterface;
 use ValeSaude\PaymentGatewayClient\Gateways\Contracts\GatewayInterface;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\IuguGateway;
 
@@ -39,6 +40,10 @@ class PaymentGatewayClientServiceProvider extends PackageServiceProvider
                 config('services.iugu.base_url', 'https://api.iugu.com'),
                 config('services.iugu.api_key')
             );
+        });
+
+        $this->app->bind(ClientInterface::class, static function (): ClientInterface {
+            return ClientManager::resolve();
         });
     }
 }
