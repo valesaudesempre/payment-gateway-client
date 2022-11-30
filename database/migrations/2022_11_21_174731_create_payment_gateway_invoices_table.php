@@ -26,6 +26,7 @@ return new class extends Migration {
             $table->foreignUuid('customer_id')
                 ->constrained('payment_gateway_customers')
                 ->cascadeOnDelete();
+            $table->nullableUuidMorphs('owner');
             $table->timestamps();
             $table->index(['gateway_id', 'gateway_slug']);
         });

@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->string('name');
             $table->string('document_type');
             $table->string('document_number');
+            $table->nullableUuidMorphs('owner');
             $table->timestamps();
             $table->index(['gateway_id', 'gateway_slug']);
         });
