@@ -125,6 +125,24 @@ class Client implements ClientInterface
         return $invoice;
     }
 
+    public function refreshInvoiceStatus(Invoice $invoice): Invoice
+    {
+        $this->ensureFeatureIsSupported(GatewayFeature::INVOICE());
+
+        $data = $this->gateway->getInvoice($invoice->gateway_id);
+
+        if ($data->status->equals(InvoiceStatus::PAID())) {
+            $invoice->markAsPaid($data->paidAt->toImmutable());
+        } elseif ($data->status->equals(InvoiceStatus::CANCELED())) {
+            $invoice->markAsCanceled();
+        } elseif ($data->status->equals(InvoiceStatus::REFUNDED())) {
+            // TODO: Utilizar valor reembolsado constante no gateway
+            $invoice->markAsRefunded($invoice->total);
+        }
+
+        return $invoice;
+    }
+
     public function chargeInvoiceUsingPaymentMethod(
         Invoice $invoice,
         Customer $customer,

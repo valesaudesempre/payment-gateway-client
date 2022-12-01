@@ -67,6 +67,11 @@ class FakeClient implements ClientInterface
         return $this->client->createInvoice($customer, $data, $payer);
     }
 
+    public function refreshInvoiceStatus(Invoice $invoice): Invoice
+    {
+        return $this->client->refreshInvoiceStatus($invoice);
+    }
+
     /**
      * @codeCoverageIgnore
      */

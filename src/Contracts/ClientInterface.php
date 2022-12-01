@@ -24,6 +24,8 @@ interface ClientInterface
 
     public function createInvoice(Customer $customer, InvoiceDTO $data, ?CustomerDTO $payer = null): Invoice;
 
+    public function refreshInvoiceStatus(Invoice $invoice): Invoice;
+
     public function chargeInvoiceUsingPaymentMethod(
         Invoice $invoice,
         Customer $customer,

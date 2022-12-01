@@ -86,10 +86,10 @@ class Invoice extends AbstractModel
         return $this->hasMany(InvoiceItem::class);
     }
 
-    public function markAsPaid(): void
+    public function markAsPaid(?CarbonImmutable $paidAt = null): void
     {
         $this->status = InvoiceStatus::PAID();
-        $this->paid_at = CarbonImmutable::now();
+        $this->paid_at = $paidAt ?? CarbonImmutable::now();
         $this->save();
     }
 

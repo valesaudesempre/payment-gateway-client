@@ -279,6 +279,48 @@ test('createInvoice creates an Invoice internally and returns when gateway does 
     $this->expectInvoiceToContainAllItems($invoice, $data->items);
 });
 
+test('refreshInvoiceStatus updates invoice status and related fields and returns updated instance', function () {
+    // given
+    $invoice = Invoice::factory()->create();
+    $paidAt = CarbonImmutable::today();
+    $this->mockGatewaySupportedFeature(GatewayFeature::INVOICE());
+    $this->gatewayMock
+        ->expects($this->once())
+        ->method('getInvoice')
+        ->with($invoice->gateway_id)
+        ->willReturn(
+            new GatewayInvoiceDTO(
+                $invoice->gateway_id,
+                $invoice->url,
+                $invoice->due_date,
+                InvoiceStatus::PAID(),
+                new GatewayInvoiceItemDTOCollection(),
+                $invoice->bank_slip_code,
+                $invoice->pix_code,
+                $paidAt,
+            )
+        );
+
+    // when
+    $this->sut->refreshInvoiceStatus($invoice);
+
+    // then
+    expect($invoice->status->equals(InvoiceStatus::PAID()))->toBeTrue()
+        ->and($invoice->paid_at->toDateString())->toEqual($paidAt->toDateString());
+});
+
+test('refreshInvoiceStatus throws when gateway does not support INVOICE feature', function () {
+    // given
+    $invoice = Invoice::factory()->create();
+    $this->mockGatewaySupportedFeature(GatewayFeature::INVOICE(), false);
+
+    // when
+    $this->sut->refreshInvoiceStatus($invoice);
+})->throws(
+    UnsupportedFeatureException::class,
+    'The gateway "mock" does not support "INVOICE" feature.'
+);
+
 test('createPaymentMethod throws when gateway does not support INVOICE_SPLIT feature', function () {
     // given
     $recipient = Recipient::factory()->create();
