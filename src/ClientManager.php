@@ -67,7 +67,7 @@ class ClientManager
         }
 
         $fake = new FakeClient($gatewaySlug);
-        /** @var MockInterface&ClientInterface $client */
+        /** @var MockInterface&FakeClient $client */
         $client = Mockery::mock($fake)->makePartial();
         self::swap($gatewaySlug, $client);
 

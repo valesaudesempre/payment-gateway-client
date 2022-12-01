@@ -8,7 +8,7 @@ use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 class MoneyCast implements CastsAttributes
 {
     /**
-     * @param int                  $value
+     * @param int|null             $value
      * @param array<string, mixed> $attributes
      */
     public function get($model, string $key, $value, array $attributes): ?Money
@@ -21,7 +21,7 @@ class MoneyCast implements CastsAttributes
     }
 
     /**
-     * @param Money                $value
+     * @param Money|null           $value
      * @param array<string, mixed> $attributes
      */
     public function set($model, string $key, $value, array $attributes): ?int

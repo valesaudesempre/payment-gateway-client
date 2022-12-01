@@ -129,9 +129,11 @@ class Client implements ClientInterface
     {
         $this->ensureFeatureIsSupported(GatewayFeature::INVOICE());
 
+        // @phpstan-ignore-next-line
         $data = $this->gateway->getInvoice($invoice->gateway_id);
 
         if ($data->status->equals(InvoiceStatus::PAID())) {
+            // @phpstan-ignore-next-line
             $invoice->markAsPaid($data->paidAt->toImmutable());
         } elseif ($data->status->equals(InvoiceStatus::CANCELED())) {
             $invoice->markAsCanceled();

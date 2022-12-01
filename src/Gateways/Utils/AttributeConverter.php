@@ -73,7 +73,7 @@ final class AttributeConverter
     }
 
     /**
-     * @return array<string, mixed>
+     * @param array<string, mixed> $response
      */
     public static function convertInvoiceResponseToGatewayInvoiceDTO(array $response): GatewayInvoiceDTO
     {
