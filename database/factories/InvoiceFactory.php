@@ -33,4 +33,11 @@ class InvoiceFactory extends Factory
     {
         return $this->state(['status' => InvoiceStatus::PAID()]);
     }
+
+    public function withPaymentMethod(InvoicePaymentMethod $method): self
+    {
+        return $this->state([
+            'available_payment_methods' => new InvoicePaymentMethodCollection([$method]),
+        ]);
+    }
 }
