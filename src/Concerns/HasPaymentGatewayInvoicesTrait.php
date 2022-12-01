@@ -27,19 +27,30 @@ trait HasPaymentGatewayInvoicesTrait
         return $this->morphMany(Invoice::class, 'owner');
     }
 
-    public function getLatestPendingInvoice(?InvoicePaymentMethod $method = null, ?string $gatewaySlug = null): ?Invoice
-    {
+    public function getLatestInvoice(
+        ?InvoiceStatus $status = null,
+        ?InvoicePaymentMethod $method = null,
+        ?string $gatewaySlug = null
+    ): ?Invoice {
         $query = $this
             ->gatewayInvoices()
-            ->whereStatus(InvoiceStatus::PENDING())
             ->belongsToGateway($gatewaySlug ?? $this->getDefaultGatewaySlug())
             ->latest();
+
+        if ($status) {
+            $query->whereStatus($status);
+        }
 
         if ($method) {
             $query->withPaymentMethod($method);
         }
 
         return $query->first();
+    }
+
+    public function getLatestPendingInvoice(?InvoicePaymentMethod $method = null, ?string $gatewaySlug = null): ?Invoice
+    {
+        return $this->getLatestInvoice(InvoiceStatus::PENDING(), $method, $gatewaySlug);
     }
 }
 
