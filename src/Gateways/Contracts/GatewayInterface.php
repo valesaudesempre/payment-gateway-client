@@ -28,6 +28,8 @@ interface GatewayInterface
         string $externalReference
     ): GatewayInvoiceDTO;
 
+    public function getInvoice(string $invoiceId): GatewayInvoiceDTO;
+
     public function chargeInvoiceUsingPaymentMethod(string $invoiceId, string $customerId, string $paymentMethodId): void;
 
     public function chargeInvoiceUsingToken(string $invoiceId, string $token): void;

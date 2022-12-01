@@ -248,6 +248,59 @@ test('createInvoice POST to v1/invoices and returns GatewayInvoiceDTO on success
     });
 });
 
+test('getInvoice GET to v1/invoices/{invoice_id} and returns GatewayInvoiceDTO on success', function () use ($baseUrl) {
+    // given
+    $invoiceId = 'some-invoice-id';
+    $dueDate = CarbonImmutable::now()->addWeek();
+    $paidAt = CarbonImmutable::now()->addDay();
+    $item1 = new InvoiceItemDTO(new Money(1000), 1, 'Item 1 description');
+    $item2 = new InvoiceItemDTO(new Money(2000), 3, 'Item 2 description');
+    $expectedExternalURL = 'https://some.url/some-invoice-id';
+    Http::fake([
+        "{$baseUrl}/v1/invoices/{$invoiceId}" => Http::response([
+            'id' => 'some-invoice-id',
+            'due_date' => $dueDate->toDateString(),
+            'status' => 'paid',
+            'secure_url' => $expectedExternalURL,
+            'paid_at' => $paidAt->toDateString(),
+            'pix' => [
+                'qrcode_text' => 'some-pix-code',
+            ],
+            'bank_slip' => [
+                'digitable_line' => 'some-bank-slip-code',
+            ],
+            'items' => [
+                [
+                    'id' => 'some-item-id-1',
+                    'description' => $item1->description,
+                    'price_cents' => $item1->price->getCents(),
+                    'quantity' => $item1->quantity,
+                ],
+                [
+                    'id' => 'some-item-id-2',
+                    'description' => $item2->description,
+                    'price_cents' => $item2->price->getCents(),
+                    'quantity' => $item2->quantity,
+                ],
+            ],
+        ]),
+    ]);
+
+    // when
+    $invoice = $this->sut->getInvoice($invoiceId);
+
+    // then
+    expect($invoice->id)->toEqual('some-invoice-id')
+        ->and($invoice->url)->toEqual($expectedExternalURL)
+        ->and($invoice->dueDate->toDateString())->toEqual($dueDate->toDateString())
+        ->and($invoice->status->equals(InvoiceStatus::PAID()))->toBeTrue()
+        ->and($invoice->items->getItems()[0]->id)->toEqual('some-item-id-1')
+        ->and($invoice->items->getItems()[1]->id)->toEqual('some-item-id-2')
+        ->and($invoice->pixCode)->toEqual('some-pix-code')
+        ->and($invoice->bankSlipCode)->toEqual('some-bank-slip-code')
+        ->and($invoice->paidAt->toDateString())->toEqual($paidAt->toDateString());
+});
+
 test('chargeInvoiceUsingPaymentMethod POST to /v1/charge', function () use ($baseUrl) {
     // given
     $invoiceId = 'some-invoice-id';

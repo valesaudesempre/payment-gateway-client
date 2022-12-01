@@ -15,15 +15,17 @@ class GatewayInvoiceDTO
     public GatewayInvoiceItemDTOCollection $items;
     public ?string $bankSlipCode;
     public ?string $pixCode;
+    public ?CarbonInterface $paidAt;
 
     public function __construct(
         string $id,
-        string $url,
+        ?string $url,
         CarbonInterface $dueDate,
         InvoiceStatus $status,
         GatewayInvoiceItemDTOCollection $items,
         ?string $bankSlipCode = null,
-        ?string $pixCode = null
+        ?string $pixCode = null,
+        ?CarbonInterface $paidAt = null
     ) {
         $this->id = $id;
         $this->url = $url;
@@ -32,6 +34,6 @@ class GatewayInvoiceDTO
         $this->items = $items;
         $this->bankSlipCode = $bankSlipCode;
         $this->pixCode = $pixCode;
+        $this->paidAt = $paidAt;
     }
-
 }

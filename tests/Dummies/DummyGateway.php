@@ -33,6 +33,11 @@ class DummyGateway implements GatewayInterface
         throw new BadMethodCallException('Not implemented.');
     }
 
+    public function getInvoice(string $invoiceId): GatewayInvoiceDTO
+    {
+        throw new BadMethodCallException('Not implemented.');
+    }
+
     public function chargeInvoiceUsingPaymentMethod(string $invoiceId, string $customerId, string $paymentMethodId): void
     {
         throw new BadMethodCallException('Not implemented.');

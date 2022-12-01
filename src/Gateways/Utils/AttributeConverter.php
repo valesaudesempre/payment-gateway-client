@@ -2,10 +2,12 @@
 
 namespace ValeSaude\PaymentGatewayClient\Gateways\Utils;
 
+use Carbon\CarbonImmutable;
 use InvalidArgumentException;
 use ValeSaude\PaymentGatewayClient\Invoice\Collections\GatewayInvoiceItemDTOCollection;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoicePaymentMethod;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoiceStatus;
+use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceItemDTO;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
@@ -68,5 +70,25 @@ final class AttributeConverter
         }
 
         return $collection;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function convertInvoiceResponseToGatewayInvoiceDTO(array $response): GatewayInvoiceDTO
+    {
+        return new GatewayInvoiceDTO(
+            data_get($response, 'id'),
+            data_get($response, 'secure_url'),
+            // @phpstan-ignore-next-line
+            CarbonImmutable::make(data_get($response, 'due_date')),
+            self::convertIuguStatusToInvoiceStatus(data_get($response, 'status')),
+            self::convertInvoiceItemsToGatewayInvoiceItemDTOCollection(data_get($response, 'items')),
+            data_get($response, 'bank_slip.digitable_line'),
+            data_get($response, 'pix.qrcode_text'),
+            data_get($response, 'paid_at')
+                ? CarbonImmutable::make(data_get($response, 'paid_at'))
+                : null,
+        );
     }
 }

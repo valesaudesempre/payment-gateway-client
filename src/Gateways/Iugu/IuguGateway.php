@@ -2,7 +2,6 @@
 
 namespace ValeSaude\PaymentGatewayClient\Gateways\Iugu;
 
-use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Arr;
@@ -112,16 +111,14 @@ class IuguGateway extends AbstractGateway
             $builder->get()
         );
 
-        return new GatewayInvoiceDTO(
-            $response->json('id'),
-            $response->json('secure_url'),
-            // @phpstan-ignore-next-line
-            CarbonImmutable::make($response->json('due_date')),
-            AttributeConverter::convertIuguStatusToInvoiceStatus($response->json('status')),
-            AttributeConverter::convertInvoiceItemsToGatewayInvoiceItemDTOCollection($response->json('items')),
-            $response->json('bank_slip.digitable_line'),
-            $response->json('pix.qrcode_text')
-        );
+        return AttributeConverter::convertInvoiceResponseToGatewayInvoiceDTO($response->json());
+    }
+
+    public function getInvoice(string $invoiceId): GatewayInvoiceDTO
+    {
+        $response = $this->doRequest('GET', "v1/invoices/{$invoiceId}");
+
+        return AttributeConverter::convertInvoiceResponseToGatewayInvoiceDTO($response->json());
     }
 
     public function chargeInvoiceUsingPaymentMethod(string $invoiceId, string $customerId, string $paymentMethodId): void

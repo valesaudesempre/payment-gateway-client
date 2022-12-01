@@ -2,6 +2,7 @@
 
 namespace ValeSaude\PaymentGatewayClient\Gateways\Fake;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Customer\GatewayPaymentMethodDTO;
@@ -146,6 +147,24 @@ class FakeGateway implements GatewayInterface
         return $invoice;
     }
 
+    public function getInvoice(string $invoiceId): GatewayInvoiceDTO
+    {
+        $customerId = null;
+
+        foreach ($this->invoices as $invoiceCustomerId => $invoices) {
+            if (isset($invoices[$invoiceId])) {
+                $customerId = $invoiceCustomerId;
+                break;
+            }
+        }
+
+        if (!isset($customerId)) {
+            throw new GatewayException('Invalid invoice id.');
+        }
+
+        return $this->invoices[$customerId][$invoiceId]['data'];
+    }
+
     public function chargeInvoiceUsingPaymentMethod(string $invoiceId, string $customerId, string $paymentMethodId): void
     {
         if (!isset($this->invoices[$customerId][$invoiceId])) {
@@ -157,6 +176,7 @@ class FakeGateway implements GatewayInterface
         }
 
         $this->invoices[$customerId][$invoiceId]['data']->status = InvoiceStatus::PAID();
+        $this->invoices[$customerId][$invoiceId]['data']->paidAt = CarbonImmutable::now();
         $this->invoices[$customerId][$invoiceId]['payment_method_id'] = $paymentMethodId;
     }
 
@@ -176,6 +196,7 @@ class FakeGateway implements GatewayInterface
         }
 
         $this->invoices[$customerId][$invoiceId]['data']->status = InvoiceStatus::PAID();
+        $this->invoices[$customerId][$invoiceId]['data']->paidAt = CarbonImmutable::now();
         $this->invoices[$customerId][$invoiceId]['token'] = $token;
     }
 
