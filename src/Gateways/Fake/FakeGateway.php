@@ -16,6 +16,8 @@ use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceItemDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\InvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\InvoiceItemDTO;
 use ValeSaude\PaymentGatewayClient\ValueObjects\CreditCard;
+use ValeSaude\PaymentGatewayClient\ValueObjects\Month;
+use ValeSaude\PaymentGatewayClient\ValueObjects\PositiveInteger;
 
 /**
  * @codeCoverageIgnore
@@ -84,8 +86,8 @@ class FakeGateway implements GatewayInterface
                     'Some Name',
                     'XXXX-XXXX-XXXX-1111',
                     'visa',
-                    '12',
-                    '99'
+                    new Month('12'),
+                    new PositiveInteger('99')
                 )
             ),
         ];
@@ -100,7 +102,7 @@ class FakeGateway implements GatewayInterface
             $this->paymentMethods[$customerId][$id]['is_default'] = true;
         }
 
-        return $this->paymentMethods[$customerId][$id];
+        return $this->paymentMethods[$customerId][$id]['data'];
     }
 
     public function createInvoice(
