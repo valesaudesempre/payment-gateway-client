@@ -96,3 +96,11 @@ test('mock method replaces default instance with mock instance when slug is not 
         ->and($previouslyResolvedClient->getGateway())->toBeInstanceOf(DummyGateway::class)
         ->and($resolvedClient)->toBeInstanceOf(MockInterface::class);
 });
+
+test('partialMock method returns mock instance made partial', function () {
+    // when
+    $mockClient = ClientManager::partialMock();
+
+    // then
+    expect($mockClient)->toBeInstanceOf(MockInterface::class);
+});

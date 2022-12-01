@@ -57,6 +57,23 @@ class ClientManager
         return $client;
     }
 
+    /**
+     * @return MockInterface&FakeClient
+     */
+    public static function partialMock(?string $gatewaySlug = null): MockInterface
+    {
+        if (!$gatewaySlug) {
+            $gatewaySlug = self::getDefaultGatewaySlug();
+        }
+
+        $fake = new FakeClient($gatewaySlug);
+        /** @var MockInterface&ClientInterface $client */
+        $client = Mockery::mock($fake)->makePartial();
+        self::swap($gatewaySlug, $client);
+
+        return $client;
+    }
+
     public static function swap(string $gatewaySlug, ClientInterface $instance): void
     {
         self::$instances[$gatewaySlug] = $instance;

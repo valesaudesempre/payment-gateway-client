@@ -2,7 +2,9 @@
 
 namespace ValeSaude\PaymentGatewayClient\Tests\Concerns;
 
+use Carbon\CarbonImmutable;
 use ValeSaude\PaymentGatewayClient\Collections\InvoiceSplitRuleCollection;
+use ValeSaude\PaymentGatewayClient\Invoice\Builders\InvoiceBuilder;
 use ValeSaude\PaymentGatewayClient\Invoice\Collections\GatewayInvoiceItemDTOCollection;
 use ValeSaude\PaymentGatewayClient\Invoice\Collections\InvoiceItemDTOCollection;
 use ValeSaude\PaymentGatewayClient\Invoice\Collections\InvoicePaymentMethodCollection;
@@ -14,12 +16,23 @@ use ValeSaude\PaymentGatewayClient\Models\Invoice;
 use ValeSaude\PaymentGatewayClient\Models\InvoiceItem;
 use ValeSaude\PaymentGatewayClient\Tests\TestCase;
 use ValeSaude\PaymentGatewayClient\ValueObjects\InvoiceSplitRule;
+use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 /**
  * @mixin TestCase
  */
 trait HasInvoiceHelperMethodsTrait
 {
+    public function createInvoiceDTO(): InvoiceDTO
+    {
+        return InvoiceBuilder::make()
+            ->setDueDate(CarbonImmutable::now()->addDay())
+            ->setAvailablePaymentMethods(...InvoicePaymentMethod::cases())
+            ->setMaxInstallments(12)
+            ->addItem(new InvoiceItemDTO(new Money(1234), 1, 'Some item'))
+            ->get();
+    }
+
     public function expectInvoiceToBeEqualsToData(Invoice $invoice, InvoiceDTO $data): void
     {
         $expectedPaymentMethods = $data->availablePaymentMethods ?? new InvoicePaymentMethodCollection(InvoicePaymentMethod::cases());

@@ -22,7 +22,7 @@ class InvoiceQueryBuilder extends AbstractGatewayModelQueryBuilder
 
     public function withPaymentMethod(InvoicePaymentMethod ...$method): self
     {
-        return $this->whereIn(
+        return $this->whereJsonContains(
             $this->qualifyColumn('available_payment_methods'),
             $method
         );

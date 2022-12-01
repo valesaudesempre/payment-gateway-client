@@ -36,7 +36,8 @@ class FakeGateway implements GatewayInterface
      *     external_reference_id: string,
      *     token: string|null,
      *     payment_method_id: string|null,
-     *     data: GatewayInvoiceDTO
+     *     data: GatewayInvoiceDTO,
+     *     payer: CustomerDTO
      * }>>
      */
     private array $invoices = [];
@@ -137,6 +138,7 @@ class FakeGateway implements GatewayInterface
         $this->invoices[$customerId][$id] = [
             'data' => $invoice,
             'external_reference' => $externalReference,
+            'payer' => $payer,
             'payment_method_id' => null,
             'token' => null,
         ];
@@ -213,7 +215,8 @@ class FakeGateway implements GatewayInterface
      *     external_reference_id: string,
      *     token: string|null,
      *     payment_method_id: string|null,
-     *     data: GatewayInvoiceDTO
+     *     data: GatewayInvoiceDTO,
+     *     payer: CustomerDTO
      * }>>
      */
     public function getInvoices(): array
