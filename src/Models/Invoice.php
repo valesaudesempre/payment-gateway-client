@@ -17,6 +17,7 @@ use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoiceStatus;
 use ValeSaude\PaymentGatewayClient\Invoice\InvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
+use ValeSaude\PaymentGatewayClient\Models\Concerns\HasOwnerTrait;
 use ValeSaude\PaymentGatewayClient\QueryBuilders\InvoiceQueryBuilder;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
@@ -41,6 +42,7 @@ class Invoice extends AbstractModel
     use GeneratesUUIDOnInitializeTrait;
     use HasFactory;
     use HasGatewayIdTrait;
+    use HasOwnerTrait;
 
     protected $table = 'payment_gateway_invoices';
 

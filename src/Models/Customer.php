@@ -9,6 +9,7 @@ use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Database\Factories\CustomerFactory;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
+use ValeSaude\PaymentGatewayClient\Models\Concerns\HasOwnerTrait;
 use ValeSaude\PaymentGatewayClient\QueryBuilders\CustomerQueryBuilder;
 use ValeSaude\PaymentGatewayClient\Recipient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
@@ -30,6 +31,7 @@ class Customer extends AbstractModel
     use GeneratesUUIDOnInitializeTrait;
     use HasFactory;
     use HasGatewayIdTrait;
+    use HasOwnerTrait;
 
     protected $table = 'payment_gateway_customers';
 

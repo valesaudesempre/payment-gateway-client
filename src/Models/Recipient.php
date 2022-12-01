@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use ValeSaude\PaymentGatewayClient\Database\Factories\RecipientFactory;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
+use ValeSaude\PaymentGatewayClient\Models\Concerns\HasOwnerTrait;
 use ValeSaude\PaymentGatewayClient\Recipient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
 
@@ -20,6 +21,7 @@ class Recipient extends AbstractModel
     use GeneratesUUIDOnInitializeTrait;
     use HasFactory;
     use HasGatewayIdTrait;
+    use HasOwnerTrait;
 
     protected $table = 'payment_gateway_recipients';
 
