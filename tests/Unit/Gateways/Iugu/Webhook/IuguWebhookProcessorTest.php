@@ -16,8 +16,8 @@ beforeEach(function () {
 test('authenticate method returns true when request authorization matches hashed webhook_token', function () {
     // given
     $token = 'some-token';
-    $request = $this->createFakeRequestObject([], ['Authorization' => $token]);
-    config(['services.iugu.webhook_token' => bcrypt($token)]);
+    $request = $this->createFakeRequestObject([], ['Authorization' => bcrypt($token)]);
+    config(['services.iugu.webhook_token' => $token]);
 
     // when
     $passes = $this->sut->authenticate($request);

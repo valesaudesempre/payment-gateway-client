@@ -16,7 +16,7 @@ class IuguWebhookProcessor implements WebhookProcessorInterface
         /** @var string $token */
         $token = $request->header('Authorization', '');
 
-        return Hash::check($token, config('services.iugu.webhook_token'));
+        return Hash::check(config('services.iugu.webhook_token'), $token);
     }
 
     public function process(Webhook $webhook): bool
