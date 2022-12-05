@@ -4,6 +4,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
+use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\InvalidPaymentTokenException;
 use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\TransactionDeclinedException;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Exceptions\GenericErrorResponseException;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\IuguGateway;
@@ -378,6 +379,28 @@ test('chargeInvoiceUsingToken throws TransactionDeclinedException when authoriza
 })->throws(
     TransactionDeclinedException::class,
     'Transaction declined with LR 01.'
+);
+
+test('chargeInvoiceUsingToken throws InvalidPaymentTokenException on HTTP success containing "token não é válido" message', function () use ($baseUrl) {
+    // given
+    Http::fake(["{$baseUrl}/v1/charge" => Http::response(['errors' => 'token não é válido'])]);
+
+    // when
+    $this->sut->chargeInvoiceUsingToken('some-invoice-id', 'some-token');
+})->throws(
+    InvalidPaymentTokenException::class,
+    'Invalid payment token.'
+);
+
+test('chargeInvoiceUsingToken throws InvalidPaymentTokenException on HTTP success containing "Esse token já foi usado." message', function () use ($baseUrl) {
+    // given
+    Http::fake(["{$baseUrl}/v1/charge" => Http::response(['errors' => 'Esse token já foi usado.'])]);
+
+    // when
+    $this->sut->chargeInvoiceUsingToken('some-invoice-id', 'some-token');
+})->throws(
+    InvalidPaymentTokenException::class,
+    'Token already used.'
 );
 
 test('chargeInvoiceUsingToken throws GenericErrorResponseException on HTTP success containing errors property', function () use ($baseUrl) {

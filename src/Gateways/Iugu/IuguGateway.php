@@ -11,6 +11,7 @@ use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Customer\GatewayPaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Gateways\AbstractGateway;
+use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\InvalidPaymentTokenException;
 use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\TransactionDeclinedException;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Builders\IuguCustomerBuilder;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Builders\IuguInvoiceBuilder;
@@ -158,6 +159,14 @@ class IuguGateway extends AbstractGateway
         if (!$response->json('success')) {
             if ($response->json('LR')) {
                 throw TransactionDeclinedException::withLR($response->json('LR'));
+            }
+
+            if ('token não é válido' === $response->json('errors')) {
+                throw InvalidPaymentTokenException::invalidToken();
+            }
+
+            if ('Esse token já foi usado.' === $response->json('errors')) {
+                throw InvalidPaymentTokenException::tokenAlreadyUsed();
             }
 
             // Por alguma razão, o Iugu retorna 200 mesmo quando ocorre um erro do tipo "esse token já foi usado"
