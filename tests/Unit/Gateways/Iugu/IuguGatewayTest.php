@@ -399,6 +399,24 @@ test('chargeInvoiceUsingToken throws RequestException on HTTP error response', f
     $this->sut->chargeInvoiceUsingToken('some-invoice-id', 'some-token');
 })->throws(RequestException::class);
 
+test('subscribeWebhook POST to /v1/web_hooks', function () use ($baseUrl) {
+    // given
+    Http::fake(["{$baseUrl}/v1/web_hooks" => Http::response()]);
+    $token = 'some-webhook-token';
+
+    // when
+    $this->sut->subscribeWebhook($token);
+
+    // then
+    Http::assertSent(static function (Request $request) use ($token) {
+        $body = $request->data();
+
+        return data_get($body, 'event') === 'all' &&
+            data_get($body, 'url') === route('webhooks.gateway', ['gateway' => 'iugu']) &&
+            data_get($body, 'authorization') === $token;
+    });
+});
+
 test('getGatewayIdentifier returns expected identifier', function () {
     // when
     $identifier = $this->sut->getGatewayIdentifier();

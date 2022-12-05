@@ -166,6 +166,19 @@ class IuguGateway extends AbstractGateway
         }
     }
 
+    public function subscribeWebhook(string $token): void
+    {
+        $this->doRequest(
+            'POST',
+            'v1/web_hooks',
+            [
+                'event' => 'all',
+                'url' => route('webhooks.gateway', ['gateway' => $this->getGatewayIdentifier()]),
+                'authorization' => $token,
+            ]
+        );
+    }
+
     public function getGatewayIdentifier(): string
     {
         return 'iugu';

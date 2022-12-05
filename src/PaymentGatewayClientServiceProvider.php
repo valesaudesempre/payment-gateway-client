@@ -4,6 +4,7 @@ namespace ValeSaude\PaymentGatewayClient;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use ValeSaude\PaymentGatewayClient\Console\Commands\SubscribeIuguWebhooksCommand;
 use ValeSaude\PaymentGatewayClient\Contracts\ClientInterface;
 use ValeSaude\PaymentGatewayClient\Gateways\Contracts\GatewayInterface;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\IuguGateway;
@@ -23,7 +24,8 @@ class PaymentGatewayClientServiceProvider extends PackageServiceProvider
                 '2022_11_24_173132_create_payment_gateway_webhooks_table'
             )
             ->runsMigrations(true)
-            ->hasRoutes('webhooks');
+            ->hasRoutes('webhooks')
+            ->hasCommand(SubscribeIuguWebhooksCommand::class);
     }
 
     public function packageRegistered(): void
