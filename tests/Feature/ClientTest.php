@@ -166,6 +166,34 @@ test('createPaymentMethod updates default payment method when setAsDefault is tr
         ->and($previouslyDefaultPaymentMethod->refresh()->is_default)->toBeFalse();
 });
 
+test('deletePaymentMethod throws when gateway does not support PAYMENT_METHOD feature', function () {
+    // given
+    $method = PaymentMethod::factory()->create();
+    $this->mockGatewaySupportedFeature(GatewayFeature::PAYMENT_METHOD(), false);
+
+    // when
+    $this->sut->deletePaymentMethod($method);
+})->throws(
+    UnsupportedFeatureException::class,
+    'The gateway "mock" does not support "PAYMENT_METHOD" feature.'
+);
+
+test('deletePaymentMethod deletes a payment method using its gateway when gateway supports PAYMENT_METHOD feature', function () {
+    // given
+    $method = PaymentMethod::factory()->create();
+    $this->mockGatewaySupportedFeature(GatewayFeature::PAYMENT_METHOD());
+    $this->gatewayMock
+        ->expects($this->once())
+        ->method('deletePaymentMethod')
+        ->with($method->customer->gateway_id, $method->gateway_id);
+
+    // when
+    $this->sut->deletePaymentMethod($method);
+
+    // then
+    expect($method->deleted_at)->not->toBeNull();
+});
+
 test('createInvoice creates an invoice using its gateway and returns and Invoice instance when gateway supports INVOICE feature', function () {
     // given
     $recipient = Recipient::factory()->create();

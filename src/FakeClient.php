@@ -62,6 +62,14 @@ class FakeClient implements ClientInterface
     /**
      * @codeCoverageIgnore
      */
+    public function deletePaymentMethod(PaymentMethod $method): void
+    {
+        $this->client->deletePaymentMethod($method);
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
     public function createInvoice(Customer $customer, InvoiceDTO $data, ?CustomerDTO $payer = null): Invoice
     {
         return $this->client->createInvoice($customer, $data, $payer);

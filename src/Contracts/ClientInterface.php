@@ -22,6 +22,8 @@ interface ClientInterface
         bool $setAsDefault = true
     ): PaymentMethod;
 
+    public function deletePaymentMethod(PaymentMethod $method): void;
+
     public function createInvoice(Customer $customer, InvoiceDTO $data, ?CustomerDTO $payer = null): Invoice;
 
     public function refreshInvoiceStatus(Invoice $invoice): Invoice;

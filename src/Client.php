@@ -74,6 +74,15 @@ class Client implements ClientInterface
         return $paymentMethod;
     }
 
+    public function deletePaymentMethod(PaymentMethod $method): void
+    {
+        $this->ensureFeatureIsSupported(GatewayFeature::PAYMENT_METHOD());
+
+        $this->gateway->deletePaymentMethod($method->customer->gateway_id, $method->gateway_id);
+
+        $method->delete();
+    }
+
     public function createInvoice(Customer $customer, InvoiceDTO $data, ?CustomerDTO $payer = null): Invoice
     {
         if (isset($data->splits) && count($data->splits)) {
