@@ -29,10 +29,11 @@ interface ClientInterface
     public function chargeInvoiceUsingPaymentMethod(
         Invoice $invoice,
         Customer $customer,
-        ?PaymentMethod $method = null
+        ?PaymentMethod $method = null,
+        int $installments = 1
     ): Invoice;
 
-    public function chargeInvoiceUsingToken(Invoice $invoice, string $token): Invoice;
+    public function chargeInvoiceUsingToken(Invoice $invoice, string $token, int $installments = 1): Invoice;
 
     public function getGateway(): GatewayInterface;
 }

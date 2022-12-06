@@ -310,7 +310,7 @@ test('chargeInvoiceUsingPaymentMethod POST to /v1/charge', function () use ($bas
     Http::fake(["{$baseUrl}/v1/charge" => Http::response(['success' => true])]);
 
     // when
-    $this->sut->chargeInvoiceUsingPaymentMethod($invoiceId, $customerId, $paymentMethodId);
+    $this->sut->chargeInvoiceUsingPaymentMethod($invoiceId, $customerId, $paymentMethodId, 2);
 
     // then
     Http::assertSent(static function (Request $request) use ($invoiceId, $customerId, $paymentMethodId) {
@@ -318,7 +318,8 @@ test('chargeInvoiceUsingPaymentMethod POST to /v1/charge', function () use ($bas
 
         return data_get($body, 'invoice_id') === $invoiceId &&
             data_get($body, 'customer_id') === $customerId &&
-            data_get($body, 'customer_payment_method_id') === $paymentMethodId;
+            data_get($body, 'customer_payment_method_id') === $paymentMethodId &&
+            data_get($body, 'months') === 2;
     });
 });
 
@@ -359,14 +360,15 @@ test('chargeInvoiceUsingToken POST to /v1/charge', function () use ($baseUrl) {
     Http::fake(["{$baseUrl}/v1/charge" => Http::response(['success' => true])]);
 
     // when
-    $this->sut->chargeInvoiceUsingToken($invoiceId, $token);
+    $this->sut->chargeInvoiceUsingToken($invoiceId, $token, 3);
 
     // then
     Http::assertSent(static function (Request $request) use ($invoiceId, $token) {
         $body = $request->data();
 
         return data_get($body, 'invoice_id') === $invoiceId &&
-            data_get($body, 'token') === $token;
+            data_get($body, 'token') === $token &&
+            data_get($body, 'months') === 3;
     });
 });
 

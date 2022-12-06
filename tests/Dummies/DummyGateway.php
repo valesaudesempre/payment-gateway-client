@@ -38,12 +38,16 @@ class DummyGateway implements GatewayInterface
         throw new BadMethodCallException('Not implemented.');
     }
 
-    public function chargeInvoiceUsingPaymentMethod(string $invoiceId, string $customerId, string $paymentMethodId): void
-    {
+    public function chargeInvoiceUsingPaymentMethod(
+        string $invoiceId,
+        string $customerId,
+        string $paymentMethodId,
+        int $installments = 1
+    ): void {
         throw new BadMethodCallException('Not implemented.');
     }
 
-    public function chargeInvoiceUsingToken(string $invoiceId, string $token): void
+    public function chargeInvoiceUsingToken(string $invoiceId, string $token, int $installments = 1): void
     {
         throw new BadMethodCallException('Not implemented.');
     }

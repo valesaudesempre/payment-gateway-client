@@ -67,6 +67,9 @@ class FakeClient implements ClientInterface
         return $this->client->createInvoice($customer, $data, $payer);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function refreshInvoiceStatus(Invoice $invoice): Invoice
     {
         return $this->client->refreshInvoiceStatus($invoice);
@@ -75,17 +78,24 @@ class FakeClient implements ClientInterface
     /**
      * @codeCoverageIgnore
      */
-    public function chargeInvoiceUsingPaymentMethod(Invoice $invoice, Customer $customer, ?PaymentMethod $method = null): Invoice
-    {
-        return $this->client->chargeInvoiceUsingPaymentMethod($invoice, $customer, $method);
+    public function chargeInvoiceUsingPaymentMethod(
+        Invoice $invoice,
+        Customer $customer,
+        ?PaymentMethod $method = null,
+        int $installments = 1
+    ): Invoice {
+        return $this->client->chargeInvoiceUsingPaymentMethod($invoice, $customer, $method, $installments);
     }
 
     /**
      * @codeCoverageIgnore
      */
-    public function chargeInvoiceUsingToken(Invoice $invoice, string $token): Invoice
-    {
-        return $this->client->chargeInvoiceUsingToken($invoice, $token);
+    public function chargeInvoiceUsingToken(
+        Invoice $invoice,
+        string $token,
+        int $installments = 1
+    ): Invoice {
+        return $this->client->chargeInvoiceUsingToken($invoice, $token, $installments);
     }
 
     /**

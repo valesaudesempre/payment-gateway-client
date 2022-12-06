@@ -13,6 +13,7 @@ class GatewayInvoiceDTO
     public CarbonInterface $dueDate;
     public InvoiceStatus $status;
     public GatewayInvoiceItemDTOCollection $items;
+    public ?int $installments;
     public ?string $bankSlipCode;
     public ?string $pixCode;
     public ?CarbonInterface $paidAt;
@@ -23,6 +24,7 @@ class GatewayInvoiceDTO
         CarbonInterface $dueDate,
         InvoiceStatus $status,
         GatewayInvoiceItemDTOCollection $items,
+        ?int $installments = null,
         ?string $bankSlipCode = null,
         ?string $pixCode = null,
         ?CarbonInterface $paidAt = null
@@ -32,6 +34,7 @@ class GatewayInvoiceDTO
         $this->dueDate = $dueDate;
         $this->status = $status;
         $this->items = $items;
+        $this->installments = $installments;
         $this->bankSlipCode = $bankSlipCode;
         $this->pixCode = $pixCode;
         $this->paidAt = $paidAt;

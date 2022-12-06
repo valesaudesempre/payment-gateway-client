@@ -77,6 +77,10 @@ final class AttributeConverter
      */
     public static function convertInvoiceResponseToGatewayInvoiceDTO(array $response): GatewayInvoiceDTO
     {
+        $paidAt = data_get($response, 'paid_at')
+            ? CarbonImmutable::make(data_get($response, 'paid_at'))
+            : null;
+
         return new GatewayInvoiceDTO(
             data_get($response, 'id'),
             data_get($response, 'secure_url'),
@@ -84,11 +88,10 @@ final class AttributeConverter
             CarbonImmutable::make(data_get($response, 'due_date')),
             self::convertIuguStatusToInvoiceStatus(data_get($response, 'status')),
             self::convertInvoiceItemsToGatewayInvoiceItemDTOCollection(data_get($response, 'items')),
+            data_get($response, 'installments', $paidAt ? 1 : null),
             data_get($response, 'bank_slip.digitable_line'),
             data_get($response, 'pix.qrcode_text'),
-            data_get($response, 'paid_at')
-                ? CarbonImmutable::make(data_get($response, 'paid_at'))
-                : null,
+            $paidAt,
         );
     }
 }

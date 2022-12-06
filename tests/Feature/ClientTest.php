@@ -202,6 +202,7 @@ test('createInvoice creates an invoice using its gateway and returns and Invoice
                 $data->dueDate,
                 InvoiceStatus::PENDING(),
                 $gatewayItems,
+                null,
                 $expectedBankSlipCode,
                 $expectedPixCode
             );
@@ -216,7 +217,8 @@ test('createInvoice creates an invoice using its gateway and returns and Invoice
         ->and($invoice->url)->toEqual($expectedURL)
         ->and($invoice->bank_slip_code)->toEqual($expectedBankSlipCode)
         ->and($invoice->pix_code)->toEqual($expectedPixCode)
-        ->and($invoice->status)->toEqual(InvoiceStatus::PENDING());
+        ->and($invoice->status)->toEqual(InvoiceStatus::PENDING())
+        ->and($invoice->installments)->toBeNull();
     $this->expectInvoiceToBeEqualsToData($invoice, $data);
     $this->expectInvoiceToContainAllGatewayItems($invoice, $gatewayItems);
 });
@@ -295,6 +297,7 @@ test('refreshInvoiceStatus updates invoice status and related fields and returns
                 $invoice->due_date,
                 InvoiceStatus::PAID(),
                 new GatewayInvoiceItemDTOCollection(),
+                1,
                 $invoice->bank_slip_code,
                 $invoice->pix_code,
                 $paidAt,
@@ -306,7 +309,8 @@ test('refreshInvoiceStatus updates invoice status and related fields and returns
 
     // then
     expect($invoice->status->equals(InvoiceStatus::PAID()))->toBeTrue()
-        ->and($invoice->paid_at->toDateString())->toEqual($paidAt->toDateString());
+        ->and($invoice->paid_at->toDateString())->toEqual($paidAt->toDateString())
+        ->and($invoice->installments)->toEqual(1);
 });
 
 test('refreshInvoiceStatus throws when gateway does not support INVOICE feature', function () {
@@ -345,17 +349,19 @@ test('chargeInvoiceUsingPaymentMethod charges an invoice using its gateway and r
         ::factory()
         ->for($customer)
         ->create();
+    $installments = 2;
     $this->gatewayMock
         ->expects($this->once())
         ->method('chargeInvoiceUsingPaymentMethod')
-        ->with($invoice->gateway_id, $customer->gateway_id, $paymentMethod->gateway_id);
+        ->with($invoice->gateway_id, $customer->gateway_id, $paymentMethod->gateway_id, $installments);
 
     // when
-    $this->sut->chargeInvoiceUsingPaymentMethod($invoice, $customer, $paymentMethod);
+    $this->sut->chargeInvoiceUsingPaymentMethod($invoice, $customer, $paymentMethod, $installments);
 
     // then
     expect($invoice->status->equals(InvoiceStatus::PAID()))->toBeTrue()
-        ->and($invoice->paid_at->toDateString())->toEqual(CarbonImmutable::today()->toDateString());
+        ->and($invoice->paid_at->toDateString())->toEqual(CarbonImmutable::today()->toDateString())
+        ->and($invoice->installments)->toEqual($installments);
 });
 
 test('chargeInvoiceUsingPaymentMethod charges using the default Customer payment method when none is provided', function () {
@@ -395,17 +401,18 @@ test('chargeInvoiceUsingPaymentMethod throws when no payment method is provided 
 test('chargeInvoiceUsingToken charges an invoice using its gateway and returns the paid Invoice instance', function () {
     // given
     $invoice = Invoice::factory()->create();
-    $customer = $invoice->customer;
     $token = 'some-token';
+    $installments = 3;
     $this->gatewayMock
         ->expects($this->once())
         ->method('chargeInvoiceUsingToken')
-        ->with($invoice->gateway_id, $token);
+        ->with($invoice->gateway_id, $token, $installments);
 
     // when
-    $this->sut->chargeInvoiceUsingToken($invoice, $token);
+    $this->sut->chargeInvoiceUsingToken($invoice, $token, $installments);
 
     // then
     expect($invoice->status->equals(InvoiceStatus::PAID()))->toBeTrue()
-        ->and($invoice->paid_at->toDateString())->toEqual(CarbonImmutable::today()->toDateString());
+        ->and($invoice->paid_at->toDateString())->toEqual(CarbonImmutable::today()->toDateString())
+        ->and($invoice->installments)->toEqual($installments);
 });

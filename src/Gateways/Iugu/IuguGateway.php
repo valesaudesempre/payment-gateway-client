@@ -122,8 +122,12 @@ class IuguGateway extends AbstractGateway
         return AttributeConverter::convertInvoiceResponseToGatewayInvoiceDTO($response->json());
     }
 
-    public function chargeInvoiceUsingPaymentMethod(string $invoiceId, string $customerId, string $paymentMethodId): void
-    {
+    public function chargeInvoiceUsingPaymentMethod(
+        string $invoiceId,
+        string $customerId,
+        string $paymentMethodId,
+        int $installments = 1
+    ): void {
         $response = $this->doRequest(
             'POST',
             'v1/charge',
@@ -131,6 +135,7 @@ class IuguGateway extends AbstractGateway
                 'invoice_id' => $invoiceId,
                 'customer_id' => $customerId,
                 'customer_payment_method_id' => $paymentMethodId,
+                'months' => $installments,
             ]
         );
 
@@ -145,7 +150,7 @@ class IuguGateway extends AbstractGateway
         }
     }
 
-    public function chargeInvoiceUsingToken(string $invoiceId, string $token): void
+    public function chargeInvoiceUsingToken(string $invoiceId, string $token, int $installments = 1): void
     {
         $response = $this->doRequest(
             'POST',
@@ -153,6 +158,7 @@ class IuguGateway extends AbstractGateway
             [
                 'invoice_id' => $invoiceId,
                 'token' => $token,
+                'months' => $installments,
             ]
         );
 

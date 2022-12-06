@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->json('splits');
             $table->string('status');
             $table->date('paid_at')->nullable();
+            $table->unsignedInteger('installments')->nullable();
             $table->date('canceled_at')->nullable();
             $table->date('refunded_at')->nullable();
             $table->bigInteger('refunded_amount')->nullable();

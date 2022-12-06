@@ -132,6 +132,7 @@ class FakeGateway implements GatewayInterface
             $data->dueDate,
             InvoiceStatus::PENDING(),
             $items,
+            null,
             "some-bank-slip-code-{$id}",
             "some-pix-code-{$id}"
         );
@@ -142,6 +143,7 @@ class FakeGateway implements GatewayInterface
             'payer' => $payer,
             'payment_method_id' => null,
             'token' => null,
+            'installments' => null,
         ];
 
         return $invoice;
@@ -165,8 +167,12 @@ class FakeGateway implements GatewayInterface
         return $this->invoices[$customerId][$invoiceId]['data'];
     }
 
-    public function chargeInvoiceUsingPaymentMethod(string $invoiceId, string $customerId, string $paymentMethodId): void
-    {
+    public function chargeInvoiceUsingPaymentMethod(
+        string $invoiceId,
+        string $customerId,
+        string $paymentMethodId,
+        int $installments = 1
+    ): void {
         if (!isset($this->invoices[$customerId][$invoiceId])) {
             throw new GatewayException('Invalid invoice id.');
         }
@@ -177,10 +183,11 @@ class FakeGateway implements GatewayInterface
 
         $this->invoices[$customerId][$invoiceId]['data']->status = InvoiceStatus::PAID();
         $this->invoices[$customerId][$invoiceId]['data']->paidAt = CarbonImmutable::now();
+        $this->invoices[$customerId][$invoiceId]['data']->installments = $installments;
         $this->invoices[$customerId][$invoiceId]['payment_method_id'] = $paymentMethodId;
     }
 
-    public function chargeInvoiceUsingToken(string $invoiceId, string $token): void
+    public function chargeInvoiceUsingToken(string $invoiceId, string $token, int $installments = 1): void
     {
         $customerId = null;
 
@@ -197,6 +204,7 @@ class FakeGateway implements GatewayInterface
 
         $this->invoices[$customerId][$invoiceId]['data']->status = InvoiceStatus::PAID();
         $this->invoices[$customerId][$invoiceId]['data']->paidAt = CarbonImmutable::now();
+        $this->invoices[$customerId][$invoiceId]['data']->installments = $installments;
         $this->invoices[$customerId][$invoiceId]['token'] = $token;
     }
 

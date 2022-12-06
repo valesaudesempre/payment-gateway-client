@@ -132,6 +132,8 @@ class Client implements ClientInterface
         // @phpstan-ignore-next-line
         $data = $this->gateway->getInvoice($invoice->gateway_id);
 
+        $invoice->installments = $data->installments;
+
         if ($data->status->equals(InvoiceStatus::PAID())) {
             // @phpstan-ignore-next-line
             $invoice->markAsPaid($data->paidAt->toImmutable());
@@ -148,7 +150,8 @@ class Client implements ClientInterface
     public function chargeInvoiceUsingPaymentMethod(
         Invoice $invoice,
         Customer $customer,
-        ?PaymentMethod $method = null
+        ?PaymentMethod $method = null,
+        int $installments = 1
     ): Invoice {
         if (!$method) {
             $defaultPaymentMethod = $customer->getDefaultPaymentMethod();
@@ -160,19 +163,28 @@ class Client implements ClientInterface
             $method = $defaultPaymentMethod;
         }
 
-        // @phpstan-ignore-next-line
-        $this->gateway->chargeInvoiceUsingPaymentMethod($invoice->gateway_id, $customer->gateway_id, $method->gateway_id);
+        $this->gateway->chargeInvoiceUsingPaymentMethod(
+            $invoice->gateway_id, // @phpstan-ignore-line
+            $customer->gateway_id, // @phpstan-ignore-line
+            $method->gateway_id, // @phpstan-ignore-line
+            $installments
+        );
 
+        $invoice->installments = $installments;
         $invoice->markAsPaid();
 
         return $invoice;
     }
 
-    public function chargeInvoiceUsingToken(Invoice $invoice, string $token): Invoice
-    {
+    public function chargeInvoiceUsingToken(
+        Invoice $invoice,
+        string $token,
+        int $installments = 1
+    ): Invoice {
         // @phpstan-ignore-next-line
-        $this->gateway->chargeInvoiceUsingToken($invoice->gateway_id, $token);
+        $this->gateway->chargeInvoiceUsingToken($invoice->gateway_id, $token, $installments);
 
+        $invoice->installments = $installments;
         $invoice->markAsPaid();
 
         return $invoice;

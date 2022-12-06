@@ -30,9 +30,14 @@ interface GatewayInterface
 
     public function getInvoice(string $invoiceId): GatewayInvoiceDTO;
 
-    public function chargeInvoiceUsingPaymentMethod(string $invoiceId, string $customerId, string $paymentMethodId): void;
+    public function chargeInvoiceUsingPaymentMethod(
+        string $invoiceId,
+        string $customerId,
+        string $paymentMethodId,
+        int $installments = 1
+    ): void;
 
-    public function chargeInvoiceUsingToken(string $invoiceId, string $token): void;
+    public function chargeInvoiceUsingToken(string $invoiceId, string $token, int $installments = 1): void;
 
     public function getGatewayIdentifier(): string;
 

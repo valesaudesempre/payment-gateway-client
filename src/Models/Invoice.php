@@ -32,6 +32,7 @@ use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
  * @property CarbonImmutable|null           $canceled_at
  * @property CarbonImmutable|null           $refunded_at
  * @property Money|null                     $refunded_amount
+ * @property int|null                       $installments
  * @property string|null                    $bank_slip_code
  * @property string|null                    $pix_code
  *
@@ -58,6 +59,7 @@ class Invoice extends AbstractModel
         'paid_at' => 'immutable_datetime',
         'canceled_at' => 'immutable_datetime',
         'refunded_at' => 'immutable_datetime',
+        'installments' => 'int',
         'refunded_amount' => Money::class,
     ];
 
