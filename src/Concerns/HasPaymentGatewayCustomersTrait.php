@@ -2,9 +2,11 @@
 
 namespace ValeSaude\PaymentGatewayClient\Concerns;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use ValeSaude\PaymentGatewayClient\Models\Customer;
+use ValeSaude\PaymentGatewayClient\Models\PaymentMethod;
 use ValeSaude\PaymentGatewayClient\QueryBuilders\CustomerQueryBuilder;
 
 /**
@@ -31,5 +33,19 @@ trait HasPaymentGatewayCustomersTrait
             ->gatewayCustomers()
             ->belongsToGateway($gatewaySlug ?? $this->getDefaultGatewaySlug())
             ->first();
+    }
+
+    /**
+     * @return Collection<PaymentMethod>|null
+     */
+    public function getGatewayPaymentMethods(?string $gatewaySlug = null): ?Collection
+    {
+        $customer = $this->getGatewayCustomer($gatewaySlug);
+
+        if (!$customer) {
+            return null;
+        }
+
+        return $customer->paymentMethods;
     }
 }
