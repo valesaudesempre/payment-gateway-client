@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use ValeSaude\PaymentGatewayClient\Events\InvoiceCanceledViaWebhook;
 use ValeSaude\PaymentGatewayClient\Events\InvoicePaidViaWebhook;
@@ -8,10 +9,13 @@ use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\UnexpectedWebhookPayloadE
 use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\WebhookSubjectNotFound;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\IuguGateway;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Webhook\IuguInvoiceEventHandler;
+use ValeSaude\PaymentGatewayClient\Invoice\Collections\GatewayInvoiceItemDTOCollection;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoiceStatus;
+use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Models\Invoice;
 use ValeSaude\PaymentGatewayClient\Models\Webhook;
 use function Pest\Laravel\expectsEvents;
+use function PHPUnit\Framework\once;
 
 beforeEach(function () {
     $this->gatewayMock = $this->createMock(IuguGateway::class);
@@ -89,6 +93,24 @@ it('marks invoice as paid and emits InvoicePaidViaWebhookEvent when data.status 
             ],
         ])
         ->create();
+    $paidAt = Carbon::today()->subDay();
+    $this->gatewayMock
+        ->expects(once())
+        ->method('getInvoice')
+        ->with($invoice->gateway_id)
+        ->willReturn(
+            new GatewayInvoiceDTO(
+                $invoice->gateway_id,
+                $invoice->url,
+                $invoice->due_date,
+                InvoiceStatus::PAID(),
+                new GatewayInvoiceItemDTOCollection(),
+                2,
+                null,
+                null,
+                $paidAt,
+            )
+        );
 
     // when
     $this->sut->handle($webhook);
@@ -96,7 +118,8 @@ it('marks invoice as paid and emits InvoicePaidViaWebhookEvent when data.status 
 
     // then
     expect($invoice->status->equals(InvoiceStatus::PAID()))->toBeTrue()
-        ->and($invoice->paid_at)->not->toBeNull();
+        ->and($invoice->paid_at->toDateString())->toEqual($paidAt->toDateString())
+        ->and($invoice->installments)->toEqual(2);
     Event::assertDispatched(InvoicePaidViaWebhook::class);
 });
 

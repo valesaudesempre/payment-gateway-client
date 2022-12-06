@@ -67,21 +67,24 @@ class IuguInvoiceEventHandler implements WebhookEventHandlerInterface
         $previousInvoiceStatus = $invoice->status;
 
         if ($newInvoiceStatus->equals(InvoiceStatus::PAID())) {
-            $invoice->markAsPaid();
+            $this->handlePaidInvoice($invoice, $webhook, $previousInvoiceStatus);
 
-            event(new InvoicePaidViaWebhook($webhook, $invoice, $previousInvoiceStatus));
-        } elseif ($newInvoiceStatus->equals(InvoiceStatus::CANCELED())) {
-            $invoice->markAsCanceled();
-
-            event(new InvoiceCanceledViaWebhook($webhook, $invoice, $previousInvoiceStatus));
-        } elseif ($newInvoiceStatus->equals(InvoiceStatus::REFUNDED())) {
-            // TODO: Utilizar valor reembolsado constante no gateway
-            $invoice->markAsRefunded($invoice->total);
-
-            event(new InvoiceRefundedViaWebhook($webhook, $invoice, $previousInvoiceStatus));
-        } else {
-            $invoice->setStatus($newInvoiceStatus);
+            return;
         }
+
+        if ($newInvoiceStatus->equals(InvoiceStatus::CANCELED())) {
+            $this->handleCanceledInvoice($invoice, $webhook, $previousInvoiceStatus);
+
+            return;
+        }
+
+        if ($newInvoiceStatus->equals(InvoiceStatus::REFUNDED())) {
+            $this->handleRefundedInvoice($invoice, $webhook, $previousInvoiceStatus);
+
+            return;
+        }
+
+        $invoice->setStatus($newInvoiceStatus);
     }
 
     private function resolveInvoice(Webhook $webhook): ?Invoice
@@ -108,5 +111,30 @@ class IuguInvoiceEventHandler implements WebhookEventHandlerInterface
         }
 
         return $invoice;
+    }
+
+    private function handlePaidInvoice(Invoice $invoice, Webhook $webhook, InvoiceStatus $previousInvoiceStatus): void
+    {
+        $gatewayInvoice = $this->gateway->getInvoice($invoice->gateway_id);
+
+        $invoice->installments = $gatewayInvoice->installments;
+        $invoice->markAsPaid($gatewayInvoice->paidAt->toImmutable());
+
+        event(new InvoicePaidViaWebhook($webhook, $invoice, $previousInvoiceStatus));
+    }
+
+    private function handleCanceledInvoice(Invoice $invoice, Webhook $webhook, InvoiceStatus $previousInvoiceStatus): void
+    {
+        $invoice->markAsCanceled();
+
+        event(new InvoiceCanceledViaWebhook($webhook, $invoice, $previousInvoiceStatus));
+    }
+
+    private function handleRefundedInvoice(Invoice $invoice, Webhook $webhook, InvoiceStatus $previousInvoiceStatus): void
+    {
+        // TODO: Utilizar valor reembolsado constante no gateway
+        $invoice->markAsRefunded($invoice->total);
+
+        event(new InvoiceRefundedViaWebhook($webhook, $invoice, $previousInvoiceStatus));
     }
 }
