@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->text('error_message')->nullable();
             $table->timestamp('requested_at');
             $table->timestamps();
+            $table->softDeletes();
             $table->index(['gateway_id', 'gateway_slug']);
         });
     }

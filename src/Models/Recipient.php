@@ -3,6 +3,7 @@
 namespace ValeSaude\PaymentGatewayClient\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use ValeSaude\PaymentGatewayClient\Database\Factories\RecipientFactory;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
@@ -22,6 +23,7 @@ class Recipient extends AbstractModel
     use HasFactory;
     use HasGatewayIdTrait;
     use HasOwnerTrait;
+    use SoftDeletes;
 
     protected $table = 'payment_gateway_recipients';
 

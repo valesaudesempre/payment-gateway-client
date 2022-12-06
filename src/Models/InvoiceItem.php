@@ -4,6 +4,7 @@ namespace ValeSaude\PaymentGatewayClient\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use ValeSaude\PaymentGatewayClient\Database\Factories\InvoiceItemFactory;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
@@ -19,6 +20,7 @@ class InvoiceItem extends AbstractModel
     use GeneratesUUIDOnInitializeTrait;
     use HasFactory;
     use HasGatewayIdTrait;
+    use SoftDeletes;
 
     protected $table = 'payment_gateway_invoice_items';
 

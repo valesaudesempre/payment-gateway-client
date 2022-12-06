@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string('document_number');
             $table->nullableUuidMorphs('owner');
             $table->timestamps();
+            $table->softDeletes();
             $table->index(['gateway_id', 'gateway_slug']);
         });
     }

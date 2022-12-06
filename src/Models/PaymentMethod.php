@@ -4,6 +4,7 @@ namespace ValeSaude\PaymentGatewayClient\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Database\Factories\PaymentMethodFactory;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
@@ -22,6 +23,7 @@ class PaymentMethod extends AbstractModel
     use GeneratesUUIDOnInitializeTrait;
     use HasFactory;
     use HasGatewayIdTrait;
+    use SoftDeletes;
 
     protected $table = 'payment_gateway_payment_methods';
 

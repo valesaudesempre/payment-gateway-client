@@ -6,6 +6,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
 use ValeSaude\PaymentGatewayClient\Casts\InvoicePaymentMethodCollectionCast;
 use ValeSaude\PaymentGatewayClient\Casts\InvoiceSplitRuleCollectionCast;
@@ -44,6 +45,7 @@ class Invoice extends AbstractModel
     use HasFactory;
     use HasGatewayIdTrait;
     use HasOwnerTrait;
+    use SoftDeletes;
 
     protected $table = 'payment_gateway_invoices';
 

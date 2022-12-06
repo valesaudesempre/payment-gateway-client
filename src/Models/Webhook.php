@@ -5,6 +5,7 @@ namespace ValeSaude\PaymentGatewayClient\Models;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use ValeSaude\PaymentGatewayClient\Database\Factories\WebhookFactory;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasDefaultAttributesOnInitializeTrait;
@@ -27,6 +28,7 @@ class Webhook extends AbstractModel
     use HasFactory;
     use HasGatewayIdTrait;
     use HasDefaultAttributesOnInitializeTrait;
+    use SoftDeletes;
 
     protected $table = 'payment_gateway_webhooks';
 

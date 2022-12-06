@@ -18,6 +18,7 @@ return new class() extends Migration {
             $table->json('address');
             $table->nullableUuidMorphs('owner');
             $table->timestamps();
+            $table->softDeletes();
             $table->index(['gateway_id', 'gateway_slug']);
         });
     }

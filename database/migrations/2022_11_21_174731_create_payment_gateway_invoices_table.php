@@ -29,6 +29,7 @@ return new class extends Migration {
                 ->cascadeOnDelete();
             $table->nullableUuidMorphs('owner');
             $table->timestamps();
+            $table->softDeletes();
             $table->index(['gateway_id', 'gateway_slug']);
         });
     }

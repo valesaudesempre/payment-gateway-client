@@ -18,6 +18,7 @@ return new class() extends Migration {
                 ->constrained('payment_gateway_customers')
                 ->cascadeOnDelete();
             $table->timestamps();
+            $table->softDeletes();
             $table->index(['gateway_id', 'gateway_slug']);
         });
     }

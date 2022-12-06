@@ -4,6 +4,7 @@ namespace ValeSaude\PaymentGatewayClient\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Database\Factories\CustomerFactory;
@@ -32,6 +33,7 @@ class Customer extends AbstractModel
     use HasFactory;
     use HasGatewayIdTrait;
     use HasOwnerTrait;
+    use SoftDeletes;
 
     protected $table = 'payment_gateway_customers';
 
