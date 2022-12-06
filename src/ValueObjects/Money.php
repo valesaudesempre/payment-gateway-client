@@ -21,7 +21,7 @@ class Money extends AbstractValueObject implements Castable
 
     public function toFloat(): float
     {
-        return round($this->cents, 2);
+        return round($this->cents / 100, 2);
     }
 
     /**
