@@ -28,6 +28,11 @@ class DummyGateway implements GatewayInterface
         throw new BadMethodCallException('Not implemented.');
     }
 
+    public function deletePaymentMethod(string $customerId, string $paymentMethodId): void
+    {
+        throw new BadMethodCallException('Not implemented.');
+    }
+
     public function createInvoice(?string $customerId, InvoiceDTO $data, CustomerDTO $payer, string $externalReference): GatewayInvoiceDTO
     {
         throw new BadMethodCallException('Not implemented.');

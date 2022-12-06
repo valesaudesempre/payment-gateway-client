@@ -107,6 +107,15 @@ class FakeGateway implements GatewayInterface
         return $this->paymentMethods[$customerId][$id]['data'];
     }
 
+    public function deletePaymentMethod(string $customerId, string $paymentMethodId): void
+    {
+        if (!isset($this->paymentMethods[$customerId][$paymentMethodId])) {
+            throw new GatewayException('Invalid payment method id.');
+        }
+
+        unset($this->paymentMethods[$customerId][$paymentMethodId]);
+    }
+
     public function createInvoice(
         ?string $customerId,
         InvoiceDTO $data,

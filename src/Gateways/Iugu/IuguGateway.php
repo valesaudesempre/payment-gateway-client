@@ -91,6 +91,14 @@ class IuguGateway extends AbstractGateway
         );
     }
 
+    public function deletePaymentMethod(string $customerId, string $paymentMethodId): void
+    {
+        $this->doRequest(
+            'DELETE',
+            "v1/customers/{$customerId}/payment_methods/{$paymentMethodId}"
+        );
+    }
+
     public function createInvoice(
         ?string $customerId,
         InvoiceDTO $data,

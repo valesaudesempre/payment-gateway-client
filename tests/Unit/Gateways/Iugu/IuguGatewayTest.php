@@ -140,6 +140,35 @@ test('createPaymentMethod throws RequestException on HTTP error response', funct
     $this->sut->createPaymentMethod($customerId, $data);
 })->throws(RequestException::class);
 
+test('deletePaymentMethod DELETE to v1/customers/{customer_id}/payment_methods/{payment_method_id}', function () use ($baseUrl) {
+    // given
+    $customerId = 'some-customer-id';
+    $paymentMethodId = 'some-payment-method-id';
+    Http::fake([
+        "{$baseUrl}/v1/customers/{$customerId}/payment_methods/{$paymentMethodId}" => Http::response(),
+    ]);
+
+    // when
+    $this->sut->deletePaymentMethod($customerId, $paymentMethodId);
+
+    // then
+    Http::assertSent(static function (Request $request) use ($paymentMethodId, $customerId, $baseUrl) {
+        return $request->url() === "{$baseUrl}/v1/customers/{$customerId}/payment_methods/{$paymentMethodId}";
+    });
+});
+
+test('deletePaymentMethod throws RequestException on HTTP error response', function () use ($baseUrl) {
+    // given
+    $customerId = 'some-customer-id';
+    $paymentMethodId = 'some-payment-method-id';
+    Http::fake([
+        "{$baseUrl}/v1/customers/{$customerId}/payment_methods/{$paymentMethodId}" => Http::response(null, 400),
+    ]);
+
+    // when
+    $this->sut->deletePaymentMethod($customerId, $paymentMethodId);
+})->throws(RequestException::class);
+
 test('createInvoice POST to v1/invoices and returns GatewayInvoiceDTO on success', function () use ($baseUrl) {
     // given
     $recipient = new Recipient(['gateway_id' => 'some-recipient-id']);

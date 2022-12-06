@@ -39,6 +39,8 @@ interface GatewayInterface
 
     public function chargeInvoiceUsingToken(string $invoiceId, string $token, int $installments = 1): void;
 
+    public function deletePaymentMethod(string $customerId, string $paymentMethodId): void;
+
     public function getGatewayIdentifier(): string;
 
     /**
