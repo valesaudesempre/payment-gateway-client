@@ -25,9 +25,9 @@ class WebhookController extends Controller
         }
 
         // @phpstan-ignore-next-line
-        dispatch(new ProcessGatewayWebhookJob($gateway, $request->input(), $request->header(), CarbonImmutable::now()));
+        dispatch(new ProcessGatewayWebhookJob($gateway, $request->input(), $request->header(), CarbonImmutable::now()))
+            ->onQueue(config('payment-gateway-client.webhook_processing_queue'));
 
-        // @phpstan-ignore-next-line
-        return response();
+        return response('', 200);
     }
 }
