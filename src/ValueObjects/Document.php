@@ -6,7 +6,7 @@ use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use InvalidArgumentException;
 use ValeSaude\PaymentGatewayClient\Casts\DocumentCast;
-use ValeSaude\PaymentGatewayClient\Recipient\Enums\DocumentType;
+use ValeSaude\PaymentGatewayClient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\Validators\CNPJValidator;
 use ValeSaude\PaymentGatewayClient\Validators\Contracts\ValidatorInterface;
 use ValeSaude\PaymentGatewayClient\Validators\CPFValidator;

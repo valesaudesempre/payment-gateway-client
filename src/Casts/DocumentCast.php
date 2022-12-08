@@ -4,7 +4,7 @@ namespace ValeSaude\PaymentGatewayClient\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use InvalidArgumentException;
-use ValeSaude\PaymentGatewayClient\Recipient\Enums\DocumentType;
+use ValeSaude\PaymentGatewayClient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
 
 class DocumentCast implements CastsAttributes

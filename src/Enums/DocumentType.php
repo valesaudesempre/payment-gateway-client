@@ -1,6 +1,6 @@
 <?php
 
-namespace ValeSaude\PaymentGatewayClient\Recipient\Enums;
+namespace ValeSaude\PaymentGatewayClient\Enums;
 
 use Spatie\Enum\Laravel\Enum;
 use ValeSaude\PaymentGatewayClient\Concerns\ConvertsEnumValueToSlugTrait;

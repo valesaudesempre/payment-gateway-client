@@ -5,10 +5,10 @@ namespace ValeSaude\PaymentGatewayClient\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use ValeSaude\PaymentGatewayClient\Database\Factories\RecipientFactory;
+use ValeSaude\PaymentGatewayClient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasOwnerTrait;
-use ValeSaude\PaymentGatewayClient\Recipient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
 
 /**

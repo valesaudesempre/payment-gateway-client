@@ -3,8 +3,8 @@
 namespace ValeSaude\PaymentGatewayClient\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use ValeSaude\PaymentGatewayClient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\Models\Recipient;
-use ValeSaude\PaymentGatewayClient\Recipient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
 
 class RecipientFactory extends Factory
