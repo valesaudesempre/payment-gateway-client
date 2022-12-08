@@ -34,4 +34,12 @@ test('validate returns correctly validates ZipCodes', function (string $zipCode,
         'some random string',
         false,
     ],
+    'ZipCode with leading characters' => [
+        '99901001000',
+        false,
+    ],
+    'ZipCode with trailing characters' => [
+        '01001000999',
+        false,
+    ],
 ]);

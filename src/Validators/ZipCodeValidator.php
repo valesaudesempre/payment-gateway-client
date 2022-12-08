@@ -13,6 +13,8 @@ class ZipCodeValidator implements ValidatorInterface
 
     public function validate(string $value): bool
     {
-        return (bool) preg_match('/\d{5}-?\d{3}/', $value);
+        $zipCode = $this->sanitize($value);
+
+        return (bool) preg_match('/^\d{8}$/', $zipCode);
     }
 }
