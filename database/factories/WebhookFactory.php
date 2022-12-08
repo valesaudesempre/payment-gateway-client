@@ -17,8 +17,8 @@ class WebhookFactory extends Factory
         return [
             'gateway_id' => $this->faker->uuid(),
             'gateway_slug' => 'mock',
-            'request' => new JsonObject([]),
-            'headers' => new JsonObject([]),
+            'request' => JsonObject::empty(),
+            'headers' => JsonObject::empty(),
             'status' => WebhookStatus::SUCCESS(),
             'requested_at' => CarbonImmutable::now(),
         ];

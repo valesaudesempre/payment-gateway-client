@@ -21,7 +21,8 @@ class PaymentGatewayClientServiceProvider extends PackageServiceProvider
                 '2022_11_21_174730_create_payment_gateway_recipients_table',
                 '2022_11_21_174731_create_payment_gateway_invoices_table',
                 '2022_11_21_174732_create_payment_gateway_invoice_items_table',
-                '2022_11_24_173132_create_payment_gateway_webhooks_table'
+                '2022_11_24_173132_create_payment_gateway_webhooks_table',
+                '2022_12_08_163702_add_columns_to_payment_gateway_recipients_table'
             )
             ->runsMigrations(true)
             ->hasRoutes('webhooks')

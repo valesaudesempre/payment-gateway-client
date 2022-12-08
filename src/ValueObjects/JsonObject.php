@@ -87,4 +87,9 @@ class JsonObject extends AbstractValueObject implements Arrayable, JsonSerializa
     {
         return new JsonSerializableValueObjectCast(static::class);
     }
+
+    public static function empty(): self
+    {
+        return new self([]);
+    }
 }
