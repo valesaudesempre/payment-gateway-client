@@ -12,6 +12,7 @@ return new class extends Migration {
                 $table->json('address');
                 $table->string('phone');
                 $table->json('bank_account');
+                $table->boolean('automatic_withdrawal');
                 $table->json('gateway_specific_data');
             });
         });
