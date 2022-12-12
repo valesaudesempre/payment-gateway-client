@@ -6,6 +6,7 @@ use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Support\Arrayable;
 use ValeSaude\PaymentGatewayClient\Casts\JsonSerializableValueObjectCast;
+use ValeSaude\PaymentGatewayClient\Recipient\Enums\BankAccountType;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Contracts\JsonSerializableValueObjectInterface;
 
 class BankAccount extends AbstractValueObject implements Arrayable, Castable, JsonSerializableValueObjectInterface
@@ -15,19 +16,22 @@ class BankAccount extends AbstractValueObject implements Arrayable, Castable, Js
     private ?string $agencyCheckDigit;
     private string $accountNumber;
     private ?string $accountCheckDigit;
+    private BankAccountType $type;
 
     public function __construct(
         Bank $bank,
         string $agencyNumber,
         ?string $agencyCheckDigit,
         string $accountNumber,
-        ?string $accountCheckDigit
+        ?string $accountCheckDigit,
+        BankAccountType $type
     ) {
         $this->bank = $bank;
         $this->agencyNumber = $agencyNumber;
         $this->agencyCheckDigit = $agencyCheckDigit;
         $this->accountNumber = $accountNumber;
         $this->accountCheckDigit = $accountCheckDigit;
+        $this->type = $type;
     }
 
     /**
@@ -36,7 +40,8 @@ class BankAccount extends AbstractValueObject implements Arrayable, Castable, Js
      *     agency_number: string,
      *     agency_check_digit: string|null,
      *     account_number: string,
-     *     account_check_digit: string|null
+     *     account_check_digit: string|null,
+     *     type: string
      * }
      */
     public function jsonSerialize(): array
@@ -50,17 +55,19 @@ class BankAccount extends AbstractValueObject implements Arrayable, Castable, Js
      *     agency_number: string,
      *     agency_check_digit: string|null,
      *     account_number: string,
-     *     account_check_digit: string|null
+     *     account_check_digit: string|null,
+     *     type: string
      * }
      */
     public function toArray(): array
     {
         return [
-            'bank' => (string) $this->bank,
+            'bank' => $this->bank->getCode(),
             'agency_number' => $this->agencyNumber,
             'agency_check_digit' => $this->agencyCheckDigit,
             'account_number' => $this->accountNumber,
             'account_check_digit' => $this->accountCheckDigit,
+            'type' => (string) $this->type,
         ];
     }
 
@@ -107,13 +114,19 @@ class BankAccount extends AbstractValueObject implements Arrayable, Castable, Js
         return "{$this->accountNumber}-{$this->accountCheckDigit}";
     }
 
+    public function getType(): BankAccountType
+    {
+        return $this->type;
+    }
+
     /**
      * @param array{
      *     bank: string,
      *     agency_number: string,
      *     agency_check_digit: string|null,
      *     account_number: string,
-     *     account_check_digit: string|null
+     *     account_check_digit: string|null,
+     *     type: string
      * } $attributes
      */
     public static function fromArray(array $attributes): self
@@ -125,6 +138,7 @@ class BankAccount extends AbstractValueObject implements Arrayable, Castable, Js
             $attributes['agency_check_digit'],
             $attributes['account_number'],
             $attributes['account_check_digit'],
+            BankAccountType::from($attributes['type'])
         );
     }
 
