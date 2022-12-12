@@ -13,6 +13,7 @@ return new class extends Migration {
                 $table->string('phone');
                 $table->json('bank_account');
                 $table->boolean('automatic_withdrawal');
+                $table->string('status');
                 $table->json('gateway_specific_data');
             });
         });
