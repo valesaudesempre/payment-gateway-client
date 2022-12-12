@@ -20,6 +20,8 @@ use ValeSaude\PaymentGatewayClient\Invoice\InvoiceItemDTO;
 use ValeSaude\PaymentGatewayClient\Models\Customer;
 use ValeSaude\PaymentGatewayClient\Models\Invoice;
 use ValeSaude\PaymentGatewayClient\Models\PaymentMethod;
+use ValeSaude\PaymentGatewayClient\Models\Recipient;
+use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 class FakeClient implements ClientInterface
@@ -104,6 +106,11 @@ class FakeClient implements ClientInterface
         int $installments = 1
     ): Invoice {
         return $this->client->chargeInvoiceUsingToken($invoice, $token, $installments);
+    }
+
+    public function createRecipient(RecipientDTO $data): Recipient
+    {
+        return $this->client->createRecipient($data);
     }
 
     /**

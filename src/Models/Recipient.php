@@ -10,6 +10,7 @@ use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrai
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasOwnerTrait;
 use ValeSaude\PaymentGatewayClient\Recipient\Enums\RecipientStatus;
+use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
 use ValeSaude\PaymentGatewayClient\ValueObjects\BankAccount;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
@@ -51,6 +52,19 @@ class Recipient extends AbstractModel
         'status' => RecipientStatus::class,
         'gateway_specific_data' => JsonObject::class,
     ];
+
+    public static function fromRecipientDTO(RecipientDTO $data): self
+    {
+        return new self([
+            'name' => $data->name,
+            'document' => $data->document,
+            'address' => $data->address,
+            'phone' => $data->phone,
+            'bank_account' => $data->bankAccount,
+            'automatic_withdrawal' => $data->automaticWithdrawal,
+            'gateway_specific_data' => $data->gatewaySpecificData,
+        ]);
+    }
 
     protected static function newFactory(): RecipientFactory
     {

@@ -9,6 +9,7 @@ use Spatie\Enum\Enum;
  * @method static self PAYMENT_METHOD()
  * @method static self INVOICE()
  * @method static self INVOICE_SPLIT()
+ * @method static self RECIPIENT()
  */
 final class GatewayFeature extends Enum
 {

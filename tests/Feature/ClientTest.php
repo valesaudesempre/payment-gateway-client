@@ -1,6 +1,7 @@
 <?php
 
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Str;
 use ValeSaude\PaymentGatewayClient\Client;
 use ValeSaude\PaymentGatewayClient\Customer\GatewayPaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Exceptions\UnsupportedFeatureException;
@@ -16,14 +17,21 @@ use ValeSaude\PaymentGatewayClient\Models\Customer;
 use ValeSaude\PaymentGatewayClient\Models\Invoice;
 use ValeSaude\PaymentGatewayClient\Models\PaymentMethod;
 use ValeSaude\PaymentGatewayClient\Models\Recipient;
+use ValeSaude\PaymentGatewayClient\Recipient\Enums\RecipientStatus;
+use ValeSaude\PaymentGatewayClient\Recipient\GatewayRecipientDTO;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasCustomerHelperMethodsTrait;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasInvoiceHelperMethodsTrait;
+use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasRecipientHelperMethodsTrait;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\MocksGatewayMethodsTrait;
+use ValeSaude\PaymentGatewayClient\ValueObjects\JsonObject;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
+use function PHPUnit\Framework\never;
+use function PHPUnit\Framework\once;
 
 uses(
     HasCustomerHelperMethodsTrait::class,
     HasInvoiceHelperMethodsTrait::class,
+    HasRecipientHelperMethodsTrait::class,
     MocksGatewayMethodsTrait::class
 );
 
@@ -38,7 +46,7 @@ test('createCustomer creates a customer using its gateway and returns a Customer
     $expectedId = $this->faker->uuid;
     $this->mockGatewaySupportedFeature(GatewayFeature::CUSTOMER());
     $this->gatewayMock
-        ->expects($this->once())
+        ->expects(once())
         ->method('createCustomer')
         ->with($data)
         ->willReturnCallback(static fn () => $expectedId);
@@ -57,7 +65,7 @@ test('createCustomer creates a Customer internally and returns when gateway does
     $data = $this->createCustomerDTO();
     $this->mockGatewaySupportedFeature(GatewayFeature::CUSTOMER(), false);
     $this->gatewayMock
-        ->expects($this->never())
+        ->expects(never())
         ->method('createCustomer');
 
     // when
@@ -74,7 +82,7 @@ test('updateCustomer updates an existing customer using its gateway and returns 
     $data = $this->createCustomerDTO();
     $this->mockGatewaySupportedFeature(GatewayFeature::CUSTOMER());
     $this->gatewayMock
-        ->expects($this->once())
+        ->expects(once())
         ->method('updateCustomer')
         ->with($customer->gateway_id, $data);
 
@@ -91,7 +99,7 @@ test('updateCustomer updates an existing Customer internally and returns the upd
     $data = $this->createCustomerDTO();
     $this->mockGatewaySupportedFeature(GatewayFeature::CUSTOMER(), false);
     $this->gatewayMock
-        ->expects($this->never())
+        ->expects(never())
         ->method('updateCustomer');
 
     // when
@@ -122,7 +130,7 @@ test('createPaymentMethod creates a payment method using its gateway and returns
     $creditCard = $this->createCreditCard();
     $this->mockGatewaySupportedFeature(GatewayFeature::PAYMENT_METHOD());
     $this->gatewayMock
-        ->expects($this->once())
+        ->expects(once())
         ->method('createPaymentMethod')
         ->with($customer->gateway_id, $data, false)
         ->willReturnCallback(static fn () => new GatewayPaymentMethodDTO($expectedId, $creditCard));
@@ -152,7 +160,7 @@ test('createPaymentMethod updates default payment method when setAsDefault is tr
     $creditCard = $this->createCreditCard();
     $this->mockGatewaySupportedFeature(GatewayFeature::PAYMENT_METHOD());
     $this->gatewayMock
-        ->expects($this->once())
+        ->expects(once())
         ->method('createPaymentMethod')
         ->with($customer->gateway_id, $data, true)
         ->willReturnCallback(static fn () => new GatewayPaymentMethodDTO($expectedId, $creditCard));
@@ -183,7 +191,7 @@ test('deletePaymentMethod deletes a payment method using its gateway when gatewa
     $method = PaymentMethod::factory()->create();
     $this->mockGatewaySupportedFeature(GatewayFeature::PAYMENT_METHOD());
     $this->gatewayMock
-        ->expects($this->once())
+        ->expects(once())
         ->method('deletePaymentMethod')
         ->with($method->customer->gateway_id, $method->gateway_id);
 
@@ -220,7 +228,7 @@ test('createInvoice creates an invoice using its gateway and returns and Invoice
         GatewayFeature::INVOICE_SPLIT()->value => true,
     ]);
     $this->gatewayMock
-        ->expects($this->once())
+        ->expects(once())
         ->method('createInvoice')
         ->with($customer->gateway_id, $data)
         ->willReturnCallback(function () use ($data, $gatewayItems, $expectedURL, $expectedInvoiceId, $expectedBankSlipCode, $expectedPixCode) {
@@ -264,7 +272,7 @@ test('createInvoice creates allows specifying custom payer for invoice', functio
         GatewayFeature::INVOICE_SPLIT()->value => true,
     ]);
     $this->gatewayMock
-        ->expects($this->once())
+        ->expects(once())
         ->method('createInvoice')
         ->with($customer->gateway_id, $data, $payer)
         ->willReturnCallback(function () use ($data, $item) {
@@ -293,7 +301,7 @@ test('createInvoice creates an Invoice internally and returns when gateway does 
         ->get();
     $this->mockGatewaySupportedFeature(GatewayFeature::INVOICE(), false);
     $this->gatewayMock
-        ->expects($this->never())
+        ->expects(never())
         ->method('createInvoice');
 
     // when
@@ -315,7 +323,7 @@ test('refreshInvoiceStatus updates invoice status and related fields and returns
     $paidAt = CarbonImmutable::today();
     $this->mockGatewaySupportedFeature(GatewayFeature::INVOICE());
     $this->gatewayMock
-        ->expects($this->once())
+        ->expects(once())
         ->method('getInvoice')
         ->with($invoice->gateway_id)
         ->willReturn(
@@ -379,7 +387,7 @@ test('chargeInvoiceUsingPaymentMethod charges an invoice using its gateway and r
         ->create();
     $installments = 2;
     $this->gatewayMock
-        ->expects($this->once())
+        ->expects(once())
         ->method('chargeInvoiceUsingPaymentMethod')
         ->with($invoice->gateway_id, $customer->gateway_id, $paymentMethod->gateway_id, $installments);
 
@@ -402,7 +410,7 @@ test('chargeInvoiceUsingPaymentMethod charges using the default Customer payment
         ->asDefault()
         ->create();
     $this->gatewayMock
-        ->expects($this->once())
+        ->expects(once())
         ->method('chargeInvoiceUsingPaymentMethod')
         ->with($invoice->gateway_id, $customer->gateway_id, $paymentMethod->gateway_id);
 
@@ -432,7 +440,7 @@ test('chargeInvoiceUsingToken charges an invoice using its gateway and returns t
     $token = 'some-token';
     $installments = 3;
     $this->gatewayMock
-        ->expects($this->once())
+        ->expects(once())
         ->method('chargeInvoiceUsingToken')
         ->with($invoice->gateway_id, $token, $installments);
 
@@ -443,4 +451,59 @@ test('chargeInvoiceUsingToken charges an invoice using its gateway and returns t
     expect($invoice->status->equals(InvoiceStatus::PAID()))->toBeTrue()
         ->and($invoice->paid_at->toDateString())->toEqual(CarbonImmutable::today()->toDateString())
         ->and($invoice->installments)->toEqual($installments);
+});
+
+test('createRecipient creates a recipient using its gateway and returns the Recipient instance when gateway supports RECIPIENT feature', function () {
+    // given
+    $data = $this->createRecipientDTO();
+    $data->gatewaySpecificData = $data->gatewaySpecificData->set('some-input-gateway-data', 1);
+    $this->mockGatewaySupportedFeature(GatewayFeature::RECIPIENT());
+    $this->gatewayMock
+        ->expects(once())
+        ->method('createRecipient')
+        ->with($data)
+        ->willReturn(
+            new GatewayRecipientDTO(
+                Str::uuid(),
+                RecipientStatus::APPROVED(),
+                new JsonObject(['some-output-gateway-data' => 2])
+            )
+        );
+
+    // when
+    $recipient = $this->sut->createRecipient($data);
+
+    // then
+    expect($recipient->name)->toEqual($data->name)
+        ->and($recipient->document->equals($data->document))->toBeTrue()
+        ->and($recipient->address->equals($data->address))->toBeTrue()
+        ->and($recipient->phone->equals($data->phone))->toBeTrue()
+        ->and($recipient->bank_account->equals($data->bankAccount))->toBeTrue()
+        ->and($recipient->automatic_withdrawal)->toEqual($data->automaticWithdrawal)
+        ->and($recipient->status->equals(RecipientStatus::APPROVED()))
+        ->and($recipient->gateway_specific_data->toArray())
+        ->toHaveKey('some-input-gateway-data', 1)
+        ->toHaveKey('some-output-gateway-data', 2);
+});
+
+test('createRecipient creates a Recipient internally and returns when gateway does not support RECIPIENT feature', function () {
+    // given
+    $data = $this->createRecipientDTO();
+    $this->mockGatewaySupportedFeature(GatewayFeature::RECIPIENT(), false);
+    $this->gatewayMock
+        ->expects(never())
+        ->method('createRecipient');
+
+    // when
+    $recipient = $this->sut->createRecipient($data);
+
+    // then
+    expect($recipient->name)->toEqual($data->name)
+        ->and($recipient->document->equals($data->document))->toBeTrue()
+        ->and($recipient->address->equals($data->address))->toBeTrue()
+        ->and($recipient->phone->equals($data->phone))->toBeTrue()
+        ->and($recipient->bank_account->equals($data->bankAccount))->toBeTrue()
+        ->and($recipient->automatic_withdrawal)->toEqual($data->automaticWithdrawal)
+        ->and($recipient->status->equals(RecipientStatus::APPROVED()))
+        ->and($recipient->gateway_specific_data->toArray())->toBeEmpty();
 });

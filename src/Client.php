@@ -17,6 +17,9 @@ use ValeSaude\PaymentGatewayClient\Invoice\InvoiceItemDTO;
 use ValeSaude\PaymentGatewayClient\Models\Customer;
 use ValeSaude\PaymentGatewayClient\Models\Invoice;
 use ValeSaude\PaymentGatewayClient\Models\PaymentMethod;
+use ValeSaude\PaymentGatewayClient\Models\Recipient;
+use ValeSaude\PaymentGatewayClient\Recipient\Enums\RecipientStatus;
+use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
 
 class Client implements ClientInterface
 {
@@ -78,6 +81,7 @@ class Client implements ClientInterface
     {
         $this->ensureFeatureIsSupported(GatewayFeature::PAYMENT_METHOD());
 
+        // @phpstan-ignore-next-line
         $this->gateway->deletePaymentMethod($method->customer->gateway_id, $method->gateway_id);
 
         $method->delete();
@@ -197,6 +201,28 @@ class Client implements ClientInterface
         $invoice->markAsPaid();
 
         return $invoice;
+    }
+
+    public function createRecipient(RecipientDTO $data): Recipient
+    {
+        $recipient = Recipient::fromRecipientDTO($data);
+        $recipient->gateway_slug = $this->gateway->getGatewayIdentifier();
+
+        if ($this->gateway->isFeatureSupported(GatewayFeature::RECIPIENT())) {
+            $gatewayData = $this->gateway->createRecipient($data);
+
+            $recipient->gateway_id = $gatewayData->id;
+            $recipient->status = $gatewayData->status;
+            $recipient->gateway_specific_data = $recipient->gateway_specific_data->merge(
+                $gatewayData->gatewaySpecificData->toArray()
+            );
+        } else {
+            $recipient->status = RecipientStatus::APPROVED();
+        }
+
+        $recipient->save();
+
+        return $recipient;
     }
 
     /**

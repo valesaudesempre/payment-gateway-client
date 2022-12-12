@@ -9,6 +9,8 @@ use ValeSaude\PaymentGatewayClient\Invoice\InvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Models\Customer;
 use ValeSaude\PaymentGatewayClient\Models\Invoice;
 use ValeSaude\PaymentGatewayClient\Models\PaymentMethod;
+use ValeSaude\PaymentGatewayClient\Models\Recipient;
+use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
 
 interface ClientInterface
 {
@@ -36,6 +38,8 @@ interface ClientInterface
     ): Invoice;
 
     public function chargeInvoiceUsingToken(Invoice $invoice, string $token, int $installments = 1): Invoice;
+
+    public function createRecipient(RecipientDTO $data): Recipient;
 
     public function getGateway(): GatewayInterface;
 }

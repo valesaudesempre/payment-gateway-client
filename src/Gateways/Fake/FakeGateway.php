@@ -20,6 +20,7 @@ use ValeSaude\PaymentGatewayClient\Recipient\Enums\RecipientStatus;
 use ValeSaude\PaymentGatewayClient\Recipient\GatewayRecipientDTO;
 use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
 use ValeSaude\PaymentGatewayClient\ValueObjects\CreditCard;
+use ValeSaude\PaymentGatewayClient\ValueObjects\JsonObject;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Month;
 use ValeSaude\PaymentGatewayClient\ValueObjects\PositiveInteger;
 
@@ -229,7 +230,7 @@ class FakeGateway implements GatewayInterface
 
         $this->recipients[$id] = $data;
 
-        return new GatewayRecipientDTO($id, RecipientStatus::APPROVED());
+        return new GatewayRecipientDTO($id, RecipientStatus::APPROVED(), JsonObject::empty());
     }
 
     public function getGatewayIdentifier(): string
