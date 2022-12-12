@@ -62,6 +62,14 @@ class JsonObject extends AbstractValueObject implements Arrayable, JsonSerializa
         return new self($content);
     }
 
+    /**
+     * @param array<string, mixed> $content
+     */
+    public function merge(array $content, bool $recursively = true): self
+    {
+        return new self(array_merge($this->content, $content));
+    }
+
     public function isEmpty(): bool
     {
         return empty($this->content);
