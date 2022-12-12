@@ -5,6 +5,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use ValeSaude\PaymentGatewayClient\Gateways\Enums\GatewayFeature;
 use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\InvalidPaymentTokenException;
 use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\TransactionDeclinedException;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Exceptions\GenericErrorResponseException;
@@ -34,7 +35,7 @@ expect()->extend('toHaveAuthorization', function (string $token) {
 
 $baseUrl = 'https://some.url';
 
-beforeEach(fn () => $this->sut = new IuguGateway($baseUrl, 'some-api-key'));
+beforeEach(fn () => $this->sut = new IuguGateway($baseUrl, 'some-api-key', false));
 
 test('createCustomer POST to /v1/customers and returns external id on success', function () use ($baseUrl) {
     // given
@@ -557,4 +558,27 @@ test('getGatewayIdentifier returns expected identifier', function () {
 
     // then
     expect($identifier)->toEqual('iugu');
+});
+
+test('getSupportedFeatures returns all features when test mode is disabled', function () {
+    // givem
+    $gateway = new IuguGateway($this->baseUrl, 'some-api-key', false);
+
+    // when
+    $supportedFeatures = $gateway->getSupportedFeatures();
+
+    // then
+    expect($supportedFeatures)->toEqualCanonicalizing(GatewayFeature::cases());
+});
+
+test('getSupportedFeatures returns all features except RECIPIENT when test mode is enabled', function () {
+    // givem
+    $gateway = new IuguGateway($this->baseUrl, 'some-api-key', true);
+
+    // when
+    $supportedFeatures = $gateway->getSupportedFeatures();
+
+    // then
+    expect($supportedFeatures)
+        ->toEqualCanonicalizing(array_diff(GatewayFeature::cases(), [GatewayFeature::RECIPIENT()]));
 });

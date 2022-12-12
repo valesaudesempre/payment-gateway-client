@@ -11,6 +11,7 @@ use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Customer\GatewayPaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Gateways\AbstractGateway;
+use ValeSaude\PaymentGatewayClient\Gateways\Enums\GatewayFeature;
 use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\InvalidPaymentTokenException;
 use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\TransactionDeclinedException;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Builders\IuguCustomerBuilder;
@@ -33,11 +34,13 @@ class IuguGateway extends AbstractGateway
 {
     private string $baseUrl;
     private string $apiKey;
+    private bool $testMode;
 
-    public function __construct(string $baseUrl, string $apiKey)
+    public function __construct(string $baseUrl, string $apiKey, bool $testMode)
     {
         $this->baseUrl = $baseUrl;
         $this->apiKey = $apiKey;
+        $this->testMode = $testMode;
     }
 
     /**
@@ -292,5 +295,14 @@ class IuguGateway extends AbstractGateway
         }
 
         throw GenericErrorResponseException::withErrors($errors);
+    }
+
+    public function getSupportedFeatures(): array
+    {
+        if ($this->testMode) {
+            return array_diff(GatewayFeature::cases(), [GatewayFeature::RECIPIENT()]);
+        }
+
+        return GatewayFeature::cases();
     }
 }
