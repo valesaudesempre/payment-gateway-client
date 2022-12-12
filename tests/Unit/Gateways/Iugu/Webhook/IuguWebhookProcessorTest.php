@@ -1,6 +1,7 @@
 <?php
 
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Webhook\IuguInvoiceEventHandler;
+use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Webhook\IuguRecipientEventHandler;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Webhook\IuguWebhookProcessor;
 use ValeSaude\PaymentGatewayClient\Models\Webhook;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\MocksHttpRequestObjectTrait;
@@ -10,7 +11,9 @@ uses(MocksHttpRequestObjectTrait::class);
 beforeEach(function () {
     $this->sut = new IuguWebhookProcessor();
     $this->iuguInvoiceEventHandlerMock = $this->createMock(IuguInvoiceEventHandler::class);
+    $this->iuguRecipientEventHandlerMock = $this->createMock(IuguRecipientEventHandler::class);
     $this->instance(IuguInvoiceEventHandler::class, $this->iuguInvoiceEventHandlerMock);
+    $this->instance(IuguRecipientEventHandler::class, $this->iuguRecipientEventHandlerMock);
 });
 
 test('authenticate method returns true when request authorization matches hashed webhook_token', function () {
@@ -74,6 +77,14 @@ test('process method returns false when event is not handled by any handlers', f
         ->with($webhook)
         ->willReturn(false);
     $this->iuguInvoiceEventHandlerMock
+        ->expects($this->never())
+        ->method('handle');
+    $this->iuguRecipientEventHandlerMock
+        ->expects($this->once())
+        ->method('shouldHandle')
+        ->with($webhook)
+        ->willReturn(false);
+    $this->iuguRecipientEventHandlerMock
         ->expects($this->never())
         ->method('handle');
 

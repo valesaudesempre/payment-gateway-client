@@ -48,6 +48,7 @@ class IuguWebhookProcessor implements WebhookProcessorInterface
     {
         return [
             IuguInvoiceEventHandler::class,
+            IuguRecipientEventHandler::class,
         ];
     }
 }

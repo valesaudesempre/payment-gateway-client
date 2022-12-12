@@ -11,7 +11,7 @@ use Spatie\Enum\Laravel\Enum;
  * @method static self PAYMENT_FAILED()
  * @method static self DUE()
  */
-final class InvoiceEvent extends Enum
+final class IuguInvoiceEvent extends Enum
 {
     /**
      * @return array<string, string>

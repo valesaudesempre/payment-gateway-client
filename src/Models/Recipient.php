@@ -53,6 +53,16 @@ class Recipient extends AbstractModel
         'gateway_specific_data' => JsonObject::class,
     ];
 
+    public function markAsApproved(): void
+    {
+        $this->update(['status' => RecipientStatus::APPROVED()]);
+    }
+
+    public function markAsDeclined(): void
+    {
+        $this->update(['status' => RecipientStatus::DECLINED()]);
+    }
+
     public static function fromRecipientDTO(RecipientDTO $data): self
     {
         return new self([

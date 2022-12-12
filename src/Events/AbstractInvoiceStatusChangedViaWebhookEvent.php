@@ -11,10 +11,10 @@ abstract class AbstractInvoiceStatusChangedViaWebhookEvent extends AbstractWebho
     private Invoice $invoice;
     private InvoiceStatus $previousStatus;
 
-    public function __construct(Webhook $webhook, Invoice $invoice, InvoiceStatus $previousStatus)
+    public function __construct(Webhook $webhook, Invoice $recipient, InvoiceStatus $previousStatus)
     {
         parent::__construct($webhook);
-        $this->invoice = $invoice;
+        $this->invoice = $recipient;
         $this->previousStatus = $previousStatus;
     }
 

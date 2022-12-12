@@ -10,7 +10,7 @@ use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\UnexpectedWebhookPayloadE
 use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\WebhookSubjectNotFound;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\IuguGateway;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Utils\IuguAttributeConverter;
-use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Webhook\Enums\InvoiceEvent;
+use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Webhook\Enums\IuguInvoiceEvent;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoiceStatus;
 use ValeSaude\PaymentGatewayClient\Models\Invoice;
 use ValeSaude\PaymentGatewayClient\Models\Webhook;
@@ -27,11 +27,11 @@ class IuguInvoiceEventHandler implements WebhookEventHandlerInterface
     public function shouldHandle(Webhook $webhook): bool
     {
         return in_array($webhook->event, [
-            InvoiceEvent::CREATED(),
-            InvoiceEvent::STATUS_CHANGED(),
-            InvoiceEvent::REFUND(),
-            InvoiceEvent::PAYMENT_FAILED(),
-            InvoiceEvent::DUE(),
+            IuguInvoiceEvent::CREATED(),
+            IuguInvoiceEvent::STATUS_CHANGED(),
+            IuguInvoiceEvent::REFUND(),
+            IuguInvoiceEvent::PAYMENT_FAILED(),
+            IuguInvoiceEvent::DUE(),
         ]);
     }
 
@@ -100,7 +100,7 @@ class IuguInvoiceEventHandler implements WebhookEventHandlerInterface
         $invoice = Invoice::findUsingGatewayId($this->gateway->getGatewayIdentifier(), $subjectId);
 
         if (!$invoice) {
-            if ((string) InvoiceEvent::CREATED() === $webhook->event) {
+            if ((string) IuguInvoiceEvent::CREATED() === $webhook->event) {
                 // TODO: No futuro, considerar se será necessário cadastrar a fatura criada no lado do gateway
                 // Faturas geradas por assinatura são geradas diretamente lá, então não as teríamos aqui
                 return null;
@@ -115,9 +115,11 @@ class IuguInvoiceEventHandler implements WebhookEventHandlerInterface
 
     private function handlePaidInvoice(Invoice $invoice, Webhook $webhook, InvoiceStatus $previousInvoiceStatus): void
     {
+        // @phpstan-ignore-next-line
         $gatewayInvoice = $this->gateway->getInvoice($invoice->gateway_id);
 
         $invoice->installments = $gatewayInvoice->installments;
+        // @phpstan-ignore-next-line
         $invoice->markAsPaid($gatewayInvoice->paidAt->toImmutable());
 
         event(new InvoicePaidViaWebhook($webhook, $invoice, $previousInvoiceStatus));
