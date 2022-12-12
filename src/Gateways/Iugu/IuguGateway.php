@@ -204,16 +204,23 @@ class IuguGateway extends AbstractGateway
             ['name' => $data->name]
         );
 
-        $gatewayId = $createAccountResponse->json('account_id');
+        $accountId = $createAccountResponse->json('account_id');
         $gatewaySpecificData = new JsonObject([
             'live_api_token' => $createAccountResponse->json('live_api_token'),
             'test_api_token' => $createAccountResponse->json('test_api_token'),
             'user_token' => $createAccountResponse->json('user_token'),
         ]);
 
-        // TODO: Implementar verificação de conta
+        $this->doRequest(
+            'POST',
+            "v1/accounts/{$accountId}/request_verification",
+            IuguRecipientBuilder::make()
+                ->fromRecipientDTO($data)
+                ->get(),
+            $gatewaySpecificData->get('user_token')
+        );
 
-        return new GatewayRecipientDTO($gatewayId, RecipientStatus::PENDING(), $gatewaySpecificData);
+        return new GatewayRecipientDTO($accountId, RecipientStatus::PENDING(), $gatewaySpecificData);
     }
 
     public function subscribeWebhook(string $token): void
@@ -243,13 +250,13 @@ class IuguGateway extends AbstractGateway
         string $method,
         string $uri,
         array $data = [],
-        ?string $token = null,
+        ?string $apiKey = null,
         bool $throwOnError = true
     ): Response {
         $pendingRequest = Http
             ::asJson()
             ->baseUrl($this->baseUrl)
-            ->withToken(base64_encode($token ?? $this->apiKey), 'Basic');
+            ->withToken(base64_encode($apiKey ?? $this->apiKey), 'Basic');
 
         if (!\in_array($method, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])) {
             throw new InvalidArgumentException("Unsupported HTTP method {$method}.");

@@ -5,6 +5,7 @@ namespace ValeSaude\PaymentGatewayClient\Tests\Concerns;
 use ValeSaude\PaymentGatewayClient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\Recipient\Enums\BankAccountType;
 use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
+use ValeSaude\PaymentGatewayClient\Recipient\RepresentativeDTO;
 use ValeSaude\PaymentGatewayClient\Tests\TestCase;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Bank;
@@ -42,7 +43,11 @@ trait HasRecipientHelperMethodsTrait
                 BankAccountType::CHECKING()
             ),
             true,
-            JsonObject::empty()
+            JsonObject::empty(),
+            new RepresentativeDTO(
+                $this->faker->name(),
+                new Document($this->faker->cnpj(), DocumentType::CNPJ())
+            )
         );
     }
 }

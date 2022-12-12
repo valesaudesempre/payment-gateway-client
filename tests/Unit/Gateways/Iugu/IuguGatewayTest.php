@@ -9,6 +9,7 @@ use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\InvalidPaymentTokenExcept
 use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\TransactionDeclinedException;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Exceptions\GenericErrorResponseException;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\IuguGateway;
+use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Utils\IuguPriceRange;
 use ValeSaude\PaymentGatewayClient\Invoice\Builders\InvoiceBuilder;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoicePaymentMethod;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoiceStatus;
@@ -23,6 +24,13 @@ uses(
     HasCustomerHelperMethodsTrait::class,
     HasRecipientHelperMethodsTrait::class,
 );
+
+expect()->extend('toHaveAuthorization', function (string $token) {
+    /** @var Request $request */
+    $request = $this->value;
+
+    return expect(head($request->header('Authorization')))->toBe('Basic '.base64_encode($token));
+});
 
 $baseUrl = 'https://some.url';
 
@@ -459,9 +467,14 @@ test('chargeInvoiceUsingToken throws RequestException on HTTP error response', f
     $this->sut->chargeInvoiceUsingToken('some-invoice-id', 'some-token');
 })->throws(RequestException::class);
 
-test('createRecipient POST to v1/marketplace/create_account and return GatewayRecipientDTO on success', function () use ($baseUrl) {
+test('createRecipient POST to v1/marketplace/create_account then POST to v1/accounts/{account_id}/request_verification and return GatewayRecipientDTO on success', function () use ($baseUrl) {
     // given
     $data = $this->createRecipientDTO();
+    $data->gatewaySpecificData = $data
+        ->gatewaySpecificData
+        ->set('price_range', IuguPriceRange::MORE_THAN_500)
+        ->set('physical_products', false)
+        ->set('business_type', 'Some business type');
     $expectedId = (string) Str::uuid();
     Http::fake([
         "{$baseUrl}/v1/marketplace/create_account" => Http::response([
@@ -470,17 +483,54 @@ test('createRecipient POST to v1/marketplace/create_account and return GatewayRe
             'test_api_token' => 'test-api-token',
             'user_token' => 'user-token',
         ]),
+        "{$baseUrl}/v1/accounts/{$expectedId}/request_verification" => Http::response(),
     ]);
 
     // when
     $recipient = $this->sut->createRecipient($data);
 
     // then
+    Http::assertSentInOrder([
+        static function (Request $request) {
+            expect($request)->toHaveAuthorization('some-api-key');
+
+            return true;
+        },
+        static function (Request $request) use ($data) {
+            $gatewaySpecificData = $data->gatewaySpecificData;
+            $address = $data->address;
+            $bankAccount = $data->bankAccount;
+
+            expect($request)->toHaveAuthorization('user-token')
+                ->and($request->data())
+                ->toHaveKey('price_range', $gatewaySpecificData->get('price_range'))
+                ->toHaveKey('physical_products', $gatewaySpecificData->get('physical_products'))
+                ->toHaveKey('business_type', $gatewaySpecificData->get('business_type'))
+                ->toHaveKey('telephone', (string) $data->phone)
+                ->toHaveKey('automatic_transfer', $data->automaticWithdrawal)
+                ->toHaveKey('person_type', 'Pessoa Jurídica')
+                ->toHaveKey('cnpj', $data->document->getNumber())
+                ->toHaveKey('cep', (string) $address->getZipCode())
+                ->toHaveKey('address', "{$address->getStreet()}, {$address->getNumber()}")
+                ->toHaveKey('district', $address->getDistrict())
+                ->toHaveKey('city', $address->getCity())
+                ->toHaveKey('state', $address->getState())
+                ->toHaveKey('resp_name', $data->representative->name)
+                ->toHaveKey('resp_cpf', $data->representative->document->getNumber())
+                ->toHaveKey('bank', (string) $bankAccount->getBank())
+                ->toHaveKey('bank_ag', $bankAccount->getAgencyFormatted())
+                ->toHaveKey('account_type', 'Corrente')
+                ->toHaveKey('bank_cc', $bankAccount->getAccountFormatted());
+
+            return true;
+        },
+    ]);
     expect($recipient->id)->toEqual($expectedId)
         ->and($recipient->status->equals(RecipientStatus::PENDING()))->toBeTrue()
-        ->and($recipient->gatewaySpecificData->get('live_api_token'))->toEqual('live-api-token')
-        ->and($recipient->gatewaySpecificData->get('test_api_token'))->toEqual('test-api-token')
-        ->and($recipient->gatewaySpecificData->get('user_token'))->toEqual('user-token');
+        ->and($recipient->gatewaySpecificData->toArray())
+        ->toHaveKey('live_api_token', 'live-api-token')
+        ->toHaveKey('test_api_token', 'test-api-token')
+        ->toHaveKey('user_token', 'user-token');
 });
 
 test('subscribeWebhook POST to /v1/web_hooks', function () use ($baseUrl) {

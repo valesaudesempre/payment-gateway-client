@@ -9,6 +9,7 @@ use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoicePaymentMethod;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoiceStatus;
 use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceItemDTO;
+use ValeSaude\PaymentGatewayClient\Recipient\Enums\BankAccountType;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 final class IuguAttributeConverter
@@ -93,5 +94,14 @@ final class IuguAttributeConverter
             data_get($response, 'pix.qrcode_text'),
             $paidAt,
         );
+    }
+
+    public static function convertBankAccountTypeToIuguAccountType(BankAccountType $type): string
+    {
+        if ($type->equals(BankAccountType::SAVING())) {
+            return 'Poupança';
+        }
+
+        return 'Corrente';
     }
 }
