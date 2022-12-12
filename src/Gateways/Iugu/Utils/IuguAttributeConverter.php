@@ -1,6 +1,6 @@
 <?php
 
-namespace ValeSaude\PaymentGatewayClient\Gateways\Utils;
+namespace ValeSaude\PaymentGatewayClient\Gateways\Iugu\Utils;
 
 use Carbon\CarbonImmutable;
 use InvalidArgumentException;
@@ -11,7 +11,7 @@ use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceItemDTO;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
-final class AttributeConverter
+final class IuguAttributeConverter
 {
     /**
      * @throws InvalidArgumentException

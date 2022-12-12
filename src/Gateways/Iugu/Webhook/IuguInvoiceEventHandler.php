@@ -9,8 +9,8 @@ use ValeSaude\PaymentGatewayClient\Gateways\Contracts\WebhookEventHandlerInterfa
 use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\UnexpectedWebhookPayloadException;
 use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\WebhookSubjectNotFound;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\IuguGateway;
+use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Utils\IuguAttributeConverter;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Webhook\Enums\InvoiceEvent;
-use ValeSaude\PaymentGatewayClient\Gateways\Utils\AttributeConverter;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoiceStatus;
 use ValeSaude\PaymentGatewayClient\Models\Invoice;
 use ValeSaude\PaymentGatewayClient\Models\Webhook;
@@ -51,7 +51,7 @@ class IuguInvoiceEventHandler implements WebhookEventHandlerInterface
                 ::withWebhookAndReason($webhook, 'Missing required data.status property.');
         }
 
-        $newInvoiceStatus = AttributeConverter::convertIuguStatusToInvoiceStatus($status);
+        $newInvoiceStatus = IuguAttributeConverter::convertIuguStatusToInvoiceStatus($status);
 
         if ($invoice->status->equals($newInvoiceStatus)) {
             // Como precisamos manter tratar os eventos com "redundância", devemos ignorar eventos que alterem

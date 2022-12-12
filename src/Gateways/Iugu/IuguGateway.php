@@ -15,9 +15,10 @@ use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\InvalidPaymentTokenExcept
 use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\TransactionDeclinedException;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Builders\IuguCustomerBuilder;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Builders\IuguInvoiceBuilder;
+use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Builders\IuguRecipientBuilder;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Exceptions\GenericErrorResponseException;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Exceptions\ValidationErrorResponseException;
-use ValeSaude\PaymentGatewayClient\Gateways\Utils\AttributeConverter;
+use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Utils\IuguAttributeConverter;
 use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\InvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Recipient\Enums\RecipientStatus;
@@ -124,14 +125,14 @@ class IuguGateway extends AbstractGateway
             $builder->get()
         );
 
-        return AttributeConverter::convertInvoiceResponseToGatewayInvoiceDTO($response->json());
+        return IuguAttributeConverter::convertInvoiceResponseToGatewayInvoiceDTO($response->json());
     }
 
     public function getInvoice(string $invoiceId): GatewayInvoiceDTO
     {
         $response = $this->doRequest('GET', "v1/invoices/{$invoiceId}");
 
-        return AttributeConverter::convertInvoiceResponseToGatewayInvoiceDTO($response->json());
+        return IuguAttributeConverter::convertInvoiceResponseToGatewayInvoiceDTO($response->json());
     }
 
     public function chargeInvoiceUsingPaymentMethod(

@@ -4,7 +4,7 @@ namespace ValeSaude\PaymentGatewayClient\Gateways\Iugu\Builders;
 
 use ValeSaude\PaymentGatewayClient\Collections\InvoiceSplitRuleCollection;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
-use ValeSaude\PaymentGatewayClient\Gateways\Utils\AttributeConverter;
+use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Utils\IuguAttributeConverter;
 use ValeSaude\PaymentGatewayClient\Invoice\Collections\InvoiceItemDTOCollection;
 use ValeSaude\PaymentGatewayClient\Invoice\Collections\InvoicePaymentMethodCollection;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoicePaymentMethod;
@@ -69,7 +69,7 @@ class IuguInvoiceBuilder extends AbstractIuguBuilder
 
         /** @var InvoicePaymentMethod $method */
         foreach ($methods as $method) {
-            $invoicePaymentMethods[] = AttributeConverter::convertInvoicePaymentMethodToIuguPaymentMethod($method);
+            $invoicePaymentMethods[] = IuguAttributeConverter::convertInvoicePaymentMethodToIuguPaymentMethod($method);
         }
 
         $this->properties['payable_with'] = $invoicePaymentMethods;
