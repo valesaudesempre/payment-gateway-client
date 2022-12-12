@@ -16,6 +16,9 @@ use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceItemDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\InvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\InvoiceItemDTO;
+use ValeSaude\PaymentGatewayClient\Recipient\Enums\RecipientStatus;
+use ValeSaude\PaymentGatewayClient\Recipient\GatewayRecipientDTO;
+use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
 use ValeSaude\PaymentGatewayClient\ValueObjects\CreditCard;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Month;
 use ValeSaude\PaymentGatewayClient\ValueObjects\PositiveInteger;
@@ -42,6 +45,9 @@ class FakeGateway implements GatewayInterface
      * }>>
      */
     private array $invoices = [];
+
+    /** @var array<string, array{data: RecipientDTO, status: RecipientStatus}> */
+    private array $recipients = [];
 
     public function __construct(string $originalGatewayId)
     {
@@ -217,6 +223,15 @@ class FakeGateway implements GatewayInterface
         $this->invoices[$customerId][$invoiceId]['token'] = $token;
     }
 
+    public function createRecipient(RecipientDTO $data): GatewayRecipientDTO
+    {
+        $id = (string) Str::uuid();
+
+        $this->recipients[$id] = $data;
+
+        return new GatewayRecipientDTO($id, RecipientStatus::APPROVED());
+    }
+
     public function getGatewayIdentifier(): string
     {
         return $this->originalGatewayId;
@@ -260,6 +275,14 @@ class FakeGateway implements GatewayInterface
     public function getInvoices(): array
     {
         return $this->invoices;
+    }
+
+    /**
+     * @return array<string, array{data: RecipientDTO, status: RecipientStatus}>
+     */
+    public function getRecipients(): array
+    {
+        return $this->recipients;
     }
 
     private function generateResourceId(): string

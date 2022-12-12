@@ -10,6 +10,8 @@ use ValeSaude\PaymentGatewayClient\Gateways\Contracts\GatewayInterface;
 use ValeSaude\PaymentGatewayClient\Gateways\Enums\GatewayFeature;
 use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\InvoiceDTO;
+use ValeSaude\PaymentGatewayClient\Recipient\GatewayRecipientDTO;
+use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
 
 class DummyGateway implements GatewayInterface
 {
@@ -53,6 +55,11 @@ class DummyGateway implements GatewayInterface
     }
 
     public function chargeInvoiceUsingToken(string $invoiceId, string $token, int $installments = 1): void
+    {
+        throw new BadMethodCallException('Not implemented.');
+    }
+
+    public function createRecipient(RecipientDTO $data): GatewayRecipientDTO
     {
         throw new BadMethodCallException('Not implemented.');
     }

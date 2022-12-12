@@ -8,6 +8,8 @@ use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Gateways\Enums\GatewayFeature;
 use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\InvoiceDTO;
+use ValeSaude\PaymentGatewayClient\Recipient\GatewayRecipientDTO;
+use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
 
 interface GatewayInterface
 {
@@ -40,6 +42,8 @@ interface GatewayInterface
     public function chargeInvoiceUsingToken(string $invoiceId, string $token, int $installments = 1): void;
 
     public function deletePaymentMethod(string $customerId, string $paymentMethodId): void;
+
+    public function createRecipient(RecipientDTO $data): GatewayRecipientDTO;
 
     public function getGatewayIdentifier(): string;
 

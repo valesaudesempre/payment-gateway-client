@@ -4,6 +4,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\InvalidPaymentTokenException;
 use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\TransactionDeclinedException;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Exceptions\GenericErrorResponseException;
@@ -13,10 +14,15 @@ use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoicePaymentMethod;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoiceStatus;
 use ValeSaude\PaymentGatewayClient\Invoice\InvoiceItemDTO;
 use ValeSaude\PaymentGatewayClient\Models\Recipient;
+use ValeSaude\PaymentGatewayClient\Recipient\Enums\RecipientStatus;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasCustomerHelperMethodsTrait;
+use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasRecipientHelperMethodsTrait;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
-uses(HasCustomerHelperMethodsTrait::class);
+uses(
+    HasCustomerHelperMethodsTrait::class,
+    HasRecipientHelperMethodsTrait::class,
+);
 
 $baseUrl = 'https://some.url';
 
@@ -452,6 +458,30 @@ test('chargeInvoiceUsingToken throws RequestException on HTTP error response', f
     // when
     $this->sut->chargeInvoiceUsingToken('some-invoice-id', 'some-token');
 })->throws(RequestException::class);
+
+test('createRecipient POST to v1/marketplace/create_account and return GatewayRecipientDTO on success', function () use ($baseUrl) {
+    // given
+    $data = $this->createRecipientDTO();
+    $expectedId = (string) Str::uuid();
+    Http::fake([
+        "{$baseUrl}/v1/marketplace/create_account" => Http::response([
+            'account_id' => $expectedId,
+            'live_api_token' => 'live-api-token',
+            'test_api_token' => 'test-api-token',
+            'user_token' => 'user-token',
+        ]),
+    ]);
+
+    // when
+    $recipient = $this->sut->createRecipient($data);
+
+    // then
+    expect($recipient->id)->toEqual($expectedId)
+        ->and($recipient->status->equals(RecipientStatus::PENDING()))->toBeTrue()
+        ->and($recipient->gatewaySpecificData->get('live_api_token'))->toEqual('live-api-token')
+        ->and($recipient->gatewaySpecificData->get('test_api_token'))->toEqual('test-api-token')
+        ->and($recipient->gatewaySpecificData->get('user_token'))->toEqual('user-token');
+});
 
 test('subscribeWebhook POST to /v1/web_hooks', function () use ($baseUrl) {
     // given

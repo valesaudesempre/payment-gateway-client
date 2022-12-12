@@ -20,7 +20,11 @@ use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Exceptions\ValidationErrorRespo
 use ValeSaude\PaymentGatewayClient\Gateways\Utils\AttributeConverter;
 use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\InvoiceDTO;
+use ValeSaude\PaymentGatewayClient\Recipient\Enums\RecipientStatus;
+use ValeSaude\PaymentGatewayClient\Recipient\GatewayRecipientDTO;
+use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
 use ValeSaude\PaymentGatewayClient\ValueObjects\CreditCard;
+use ValeSaude\PaymentGatewayClient\ValueObjects\JsonObject;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Month;
 use ValeSaude\PaymentGatewayClient\ValueObjects\PositiveInteger;
 
@@ -189,6 +193,28 @@ class IuguGateway extends AbstractGateway
         }
     }
 
+    public function createRecipient(RecipientDTO $data): GatewayRecipientDTO
+    {
+        // TODO: Lidar com "ambiente" (esse recurso não funciona em ambiente dev)
+
+        $createAccountResponse = $this->doRequest(
+            'POST',
+            'v1/marketplace/create_account',
+            ['name' => $data->name]
+        );
+
+        $gatewayId = $createAccountResponse->json('account_id');
+        $gatewaySpecificData = new JsonObject([
+            'live_api_token' => $createAccountResponse->json('live_api_token'),
+            'test_api_token' => $createAccountResponse->json('test_api_token'),
+            'user_token' => $createAccountResponse->json('user_token'),
+        ]);
+
+        // TODO: Implementar verificação de conta
+
+        return new GatewayRecipientDTO($gatewayId, RecipientStatus::PENDING(), $gatewaySpecificData);
+    }
+
     public function subscribeWebhook(string $token): void
     {
         $this->doRequest(
@@ -212,12 +238,17 @@ class IuguGateway extends AbstractGateway
      *
      * @throws RequestException
      */
-    public function doRequest(string $method, string $uri, array $data = [], bool $throwOnError = true): Response
-    {
+    public function doRequest(
+        string $method,
+        string $uri,
+        array $data = [],
+        ?string $token = null,
+        bool $throwOnError = true
+    ): Response {
         $pendingRequest = Http
             ::asJson()
             ->baseUrl($this->baseUrl)
-            ->withToken(base64_encode($this->apiKey), 'Basic');
+            ->withToken(base64_encode($token ?? $this->apiKey), 'Basic');
 
         if (!\in_array($method, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])) {
             throw new InvalidArgumentException("Unsupported HTTP method {$method}.");
