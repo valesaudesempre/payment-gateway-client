@@ -14,6 +14,6 @@ trait GeneratesUUIDOnInitializeTrait
 {
     public function initializeGeneratesUUIDOnInitializeTrait(): void
     {
-        $this->id = (string) Str::uuid();
+        $this->id = (string) Str::orderedUuid();
     }
 }

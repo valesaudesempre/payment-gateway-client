@@ -20,7 +20,7 @@ trait HasDefaultOrderingTrait
     public static function bootHasDefaultOrderingTrait(): void
     {
         static::addGlobalScope('latest', static function (Builder $query) {
-            $query->latest();
+            $query->latest('id');
         });
     }
 }
