@@ -42,7 +42,7 @@ class PaymentGatewayClientServiceProvider extends PackageServiceProvider
             return new IuguGateway(
                 config('services.iugu.base_url', 'https://api.iugu.com'),
                 config('services.iugu.api_key'),
-                config('services,iugu.test_mode', false)
+                config('services.iugu.test_mode', false)
             );
         });
 
