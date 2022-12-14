@@ -481,6 +481,7 @@ test('createRecipient creates a recipient using its gateway and returns the Reci
         ->and($recipient->bank_account->equals($data->bankAccount))->toBeTrue()
         ->and($recipient->automatic_withdrawal)->toEqual($data->automaticWithdrawal)
         ->and($recipient->status->equals(RecipientStatus::APPROVED()))
+        ->and($recipient->gateway_id)->not->toStartWith('fake-')
         ->and($recipient->gateway_specific_data->toArray())
         ->toHaveKey('some-input-gateway-data', 1)
         ->toHaveKey('some-output-gateway-data', 2);
@@ -505,5 +506,6 @@ test('createRecipient creates a Recipient internally and returns when gateway do
         ->and($recipient->bank_account->equals($data->bankAccount))->toBeTrue()
         ->and($recipient->automatic_withdrawal)->toEqual($data->automaticWithdrawal)
         ->and($recipient->status->equals(RecipientStatus::APPROVED()))
+        ->and($recipient->gateway_id)->toStartWith('fake-')
         ->and($recipient->gateway_specific_data->toArray())->toBeEmpty();
 });

@@ -2,6 +2,7 @@
 
 namespace ValeSaude\PaymentGatewayClient;
 
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use ValeSaude\PaymentGatewayClient\Contracts\ClientInterface;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
@@ -217,6 +218,7 @@ class Client implements ClientInterface
                 $gatewayData->gatewaySpecificData->toArray()
             );
         } else {
+            $recipient->gateway_id = 'fake-'.Str::uuid();
             $recipient->status = RecipientStatus::APPROVED();
         }
 

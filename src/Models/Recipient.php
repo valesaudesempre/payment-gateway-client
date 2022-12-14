@@ -9,8 +9,10 @@ use ValeSaude\PaymentGatewayClient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasOwnerTrait;
+use ValeSaude\PaymentGatewayClient\QueryBuilders\RecipientQueryBuilder;
 use ValeSaude\PaymentGatewayClient\Recipient\Enums\RecipientStatus;
 use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
+use ValeSaude\PaymentGatewayClient\Recipient\RepresentativeDTO;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
 use ValeSaude\PaymentGatewayClient\ValueObjects\BankAccount;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
@@ -59,6 +61,11 @@ class Recipient extends AbstractModel
         'gateway_specific_data' => JsonObject::class,
     ];
 
+    public function newEloquentBuilder($query): RecipientQueryBuilder
+    {
+        return new RecipientQueryBuilder($query);
+    }
+
     public function markAsApproved(): void
     {
         $this->update(['status' => RecipientStatus::APPROVED()]);
@@ -67,6 +74,22 @@ class Recipient extends AbstractModel
     public function markAsDeclined(): void
     {
         $this->update(['status' => RecipientStatus::DECLINED()]);
+    }
+
+    public function toRecipientDTO(): RecipientDTO
+    {
+        return new RecipientDTO(
+            $this->name,
+            $this->document,
+            $this->address,
+            $this->phone,
+            $this->bank_account,
+            $this->automatic_withdrawal,
+            $this->gateway_specific_data,
+            $this->representative_name && $this->representative_document
+                ? new RepresentativeDTO($this->representative_name, $this->representative_document)
+                : null
+        );
     }
 
     public static function fromRecipientDTO(RecipientDTO $data): self
