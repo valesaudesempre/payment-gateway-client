@@ -35,6 +35,6 @@ trait HasPaymentGatewayRecipientsTrait
 
     public function getGatewayRecipientId(?string $gatewaySlug = null): ?string
     {
-        return (string) $this->getGatewayRecipient($gatewaySlug)->gateway_id;
+        return optional($this->getGatewayRecipient($gatewaySlug))->gateway_id;
     }
 }
