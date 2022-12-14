@@ -18,16 +18,20 @@ use ValeSaude\PaymentGatewayClient\ValueObjects\JsonObject;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Phone;
 
 /**
- * @property string          $name
- * @property Document        $document
- * @property string          $document_number
- * @property DocumentType    $document_type
- * @property Address         $address
- * @property Phone           $phone
- * @property BankAccount     $bank_account
- * @property bool            $automatic_withdrawal
- * @property RecipientStatus $status
- * @property JsonObject      $gateway_specific_data
+ * @property string            $name
+ * @property Document          $document
+ * @property string            $document_number
+ * @property DocumentType      $document_type
+ * @property string|null       $representative_name
+ * @property Document|null     $representative_document
+ * @property string|null       $representative_document_number
+ * @property DocumentType|null $representative_document_type
+ * @property Address           $address
+ * @property Phone             $phone
+ * @property BankAccount       $bank_account
+ * @property bool              $automatic_withdrawal
+ * @property RecipientStatus   $status
+ * @property JsonObject        $gateway_specific_data
  */
 class Recipient extends AbstractModel
 {
@@ -45,6 +49,8 @@ class Recipient extends AbstractModel
     protected $casts = [
         'document' => Document::class,
         'document_type' => DocumentType::class,
+        'representative_document' => Document::class,
+        'representative_document_type' => DocumentType::class.':nullable',
         'address' => Address::class,
         'phone' => Phone::class,
         'bank_account' => BankAccount::class,
@@ -68,6 +74,8 @@ class Recipient extends AbstractModel
         return new self([
             'name' => $data->name,
             'document' => $data->document,
+            'representative_name' => optional($data->representative)->name,
+            'representative_document' => optional($data->representative)->document,
             'address' => $data->address,
             'phone' => $data->phone,
             'bank_account' => $data->bankAccount,

@@ -26,6 +26,8 @@ class RecipientFactory extends Factory
             'gateway_slug' => 'mock',
             'name' => $this->faker->name(),
             'document' => new Document($this->faker->cnpj(), DocumentType::CNPJ()),
+            'representative_name' => $this->faker->name(),
+            'representative_document' => new Document($this->faker->cpf(), DocumentType::CPF()),
             'address' => new Address(
                 new ZipCode($this->faker->numerify('########')),
                 $this->faker->streetName(),
