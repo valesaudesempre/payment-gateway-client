@@ -7,11 +7,17 @@ use ValeSaude\PaymentGatewayClient\Customer\GatewayPaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\FakeClient;
 use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceDTO;
+use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasCustomerHelperMethodsTrait;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasInvoiceHelperMethodsTrait;
+use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasRecipientHelperMethodsTrait;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
 
-uses(HasCustomerHelperMethodsTrait::class, HasInvoiceHelperMethodsTrait::class);
+uses(
+    HasCustomerHelperMethodsTrait::class,
+    HasInvoiceHelperMethodsTrait::class,
+    HasRecipientHelperMethodsTrait::class,
+);
 
 beforeEach(function () {
     $this->sut = new FakeClient('some-gateway-slug');
@@ -275,4 +281,54 @@ test('assertInvoiceNotPaid throws when expectation at least one invoice was paid
 test('assertInvoiceNotPaid correctly asserts no invoice paid', function () {
     // when
     $this->sut->assertInvoiceNotPaid();
+});
+
+test('assertRecipientCreated throws AssertionFailedException when expectation is not provided and no customer was created', function () {
+    // then
+    $this->expectExceptionObject(new AssertionFailedError('Failed asserting that any recipient was created.'));
+
+    // when
+    $this->sut->assertRecipientCreated();
+});
+
+test('assertRecipientCreated throws when expectation does not match any created recipient', function () {
+    // given
+    $this->sut->createRecipient($this->createRecipientDTO());
+    $this->sut->createRecipient($this->createRecipientDTO());
+
+    // then
+    $this->expectExceptionObject(new AssertionFailedError('Failed asserting that a given recipient was created.'));
+
+    // when
+    $this->sut->assertRecipientCreated(function (RecipientDTO $data) {
+        return $data->document->equals(new Document($this->faker->cnpj(false), DocumentType::CNPJ()));
+    });
+});
+
+test('assertRecipientCreated correctly asserts created recipients', function () {
+    // given
+    $this->sut->createRecipient($this->createRecipientDTO());
+    $recipient = $this->sut->createRecipient($this->createRecipientDTO());
+
+    // when
+    $this->sut->assertRecipientCreated();
+    $this->sut->assertRecipientCreated(static function (RecipientDTO $data) use ($recipient) {
+        return $data->document->equals($recipient->document);
+    });
+});
+
+test('assertRecipientNotCreated throws when expectation at least one recipient was created', function () {
+    // given
+    $this->sut->createRecipient($this->createRecipientDTO());
+
+    // then
+    $this->expectExceptionObject(new AssertionFailedError('Failed asserting that no recipient was created.'));
+
+    // when
+    $this->sut->assertRecipientNotCreated();
+});
+
+test('assertRecipientNotCreated correctly asserts no recipients created', function () {
+    // when
+    $this->sut->assertRecipientNotCreated();
 });

@@ -21,6 +21,7 @@ use ValeSaude\PaymentGatewayClient\Models\Customer;
 use ValeSaude\PaymentGatewayClient\Models\Invoice;
 use ValeSaude\PaymentGatewayClient\Models\PaymentMethod;
 use ValeSaude\PaymentGatewayClient\Models\Recipient;
+use ValeSaude\PaymentGatewayClient\Recipient\Enums\RecipientStatus;
 use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
@@ -108,6 +109,9 @@ class FakeClient implements ClientInterface
         return $this->client->chargeInvoiceUsingToken($invoice, $token, $installments);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function createRecipient(RecipientDTO $data): Recipient
     {
         return $this->client->createRecipient($data);
@@ -311,6 +315,44 @@ class FakeClient implements ClientInterface
         );
     }
 
+    /**
+     * @param callable(RecipientDTO $data=, RecipientStatus $status=): bool $expectation
+     */
+    public function assertRecipientCreated(?callable $expectation = null): void
+    {
+        $wasCreated = false;
+
+        if ($expectation === null) {
+            Assert::assertNotEmpty(
+                $this->gateway->getRecipients(),
+                'Failed asserting that any recipient was created.'
+            );
+
+            return;
+        }
+
+        foreach ($this->gateway->getRecipients() as $params) {
+            if (true === $expectation($params['data'], $params['status'])) {
+                $wasCreated = true;
+
+                break;
+            }
+        }
+
+        Assert::assertTrue($wasCreated, 'Failed asserting that a given recipient was created.');
+    }
+
+    public function assertRecipientNotCreated(): void
+    {
+        Assert::assertEmpty(
+            $this->gateway->getRecipients(),
+            'Failed asserting that no recipient was created.'
+        );
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
     public function mockExistingCustomer(?CustomerDTO $data = null): Customer
     {
         if (!$data) {
@@ -323,6 +365,9 @@ class FakeClient implements ClientInterface
         return $this->createCustomer($data);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function mockExistingPaymentMethod(?Customer $customer = null, ?PaymentMethodDTO $data = null): PaymentMethod
     {
         if (!$customer) {
@@ -339,6 +384,9 @@ class FakeClient implements ClientInterface
         return $this->createPaymentMethod($customer, $data);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function mockExistingInvoice(?Customer $customer = null, ?InvoiceDTO $data = null): Invoice
     {
         if (!$customer) {
@@ -355,5 +403,20 @@ class FakeClient implements ClientInterface
         }
 
         return $this->createInvoice($customer, $data);
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public function mockExistingRecipient(?RecipientDTO $data = null): Recipient
+    {
+        if (!$data) {
+            $data = Recipient
+                ::factory()
+                ->make()
+                ->toRecipientDTO();
+        }
+
+        return $this->createRecipient($data);
     }
 }

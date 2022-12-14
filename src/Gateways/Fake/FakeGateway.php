@@ -227,10 +227,12 @@ class FakeGateway implements GatewayInterface
     public function createRecipient(RecipientDTO $data): GatewayRecipientDTO
     {
         $id = (string) Str::uuid();
+        $status = RecipientStatus::APPROVED();
 
-        $this->recipients[$id] = $data;
+        $this->recipients[$id]['data'] = $data;
+        $this->recipients[$id]['status'] = $status;
 
-        return new GatewayRecipientDTO($id, RecipientStatus::APPROVED(), JsonObject::empty());
+        return new GatewayRecipientDTO($id, $status, JsonObject::empty());
     }
 
     public function getGatewayIdentifier(): string
