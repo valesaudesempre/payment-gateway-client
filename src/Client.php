@@ -90,17 +90,24 @@ class Client implements ClientInterface
 
     public function createInvoice(Customer $customer, InvoiceDTO $data, ?CustomerDTO $payer = null): Invoice
     {
-        if (isset($data->splits) && count($data->splits)) {
+        $invoiceHasSplits = isset($data->splits) && count($data->splits);
+
+        if ($invoiceHasSplits) {
             $this->ensureFeatureIsSupported(GatewayFeature::INVOICE_SPLIT());
         }
 
         $invoice = Invoice::fromInvoiceDTO($data);
         $items = null;
+        $invoiceData = clone $data;
+
+        if ($invoiceHasSplits && !$this->gateway->isFeatureSupported(GatewayFeature::RECIPIENT())) {
+            $invoiceData->splits = null;
+        }
 
         if ($this->gateway->isFeatureSupported(GatewayFeature::INVOICE())) {
             $gatewayInvoice = $this->gateway->createInvoice(
                 $customer->gateway_id,
-                $data,
+                $invoiceData,
                 $payer ?? $customer->toCustomerDTO(),
                 $invoice->id
             );

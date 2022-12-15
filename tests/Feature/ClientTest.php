@@ -12,6 +12,7 @@ use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoicePaymentMethod;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoiceStatus;
 use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceItemDTO;
+use ValeSaude\PaymentGatewayClient\Invoice\InvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\InvoiceItemDTO;
 use ValeSaude\PaymentGatewayClient\Models\Customer;
 use ValeSaude\PaymentGatewayClient\Models\Invoice;
@@ -25,6 +26,7 @@ use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasRecipientHelperMethodsTrait
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\MocksGatewayMethodsTrait;
 use ValeSaude\PaymentGatewayClient\ValueObjects\JsonObject;
 use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
+use function PHPUnit\Framework\callback;
 use function PHPUnit\Framework\never;
 use function PHPUnit\Framework\once;
 
@@ -226,6 +228,7 @@ test('createInvoice creates an invoice using its gateway and returns and Invoice
     $this->mockGatewayMultipleSupportedFeatures([
         GatewayFeature::INVOICE()->value => true,
         GatewayFeature::INVOICE_SPLIT()->value => true,
+        GatewayFeature::RECIPIENT()->value => true,
     ]);
     $this->gatewayMock
         ->expects(once())
@@ -259,6 +262,44 @@ test('createInvoice creates an invoice using its gateway and returns and Invoice
     $this->expectInvoiceToContainAllGatewayItems($invoice, $gatewayItems);
 });
 
+test('createInvoice creates an invoice using its gateway without sending splits when RECIPIENT feature is not supported', function () {
+    // given
+    $recipient = Recipient::factory()->create();
+    $customer = Customer::factory()->create();
+    $item = new InvoiceItemDTO(new Money(1000), 1, 'Some description');
+    $data = InvoiceBuilder::make()
+        ->addItem($item)
+        ->addSplit($recipient, new Money(500))
+        ->get();
+    $this->mockGatewayMultipleSupportedFeatures([
+        GatewayFeature::INVOICE()->value => true,
+        GatewayFeature::INVOICE_SPLIT()->value => true,
+    ]);
+    $this->gatewayMock
+        ->expects(once())
+        ->method('createInvoice')
+        ->with(
+            $customer->gateway_id,
+            callback(fn (InvoiceDTO $data) => null === $data->splits)
+        )
+        ->willReturnCallback(function () use ($data, $item) {
+            return new GatewayInvoiceDTO(
+                'some-invoice-id',
+                'https://some.url/some-invoice-id',
+                $data->dueDate,
+                InvoiceStatus::PENDING(),
+                GatewayInvoiceItemDTOCollection::make()
+                    ->add(GatewayInvoiceItemDTO::fromInvoiceItemDTO($item))
+            );
+        });
+
+    // when
+    $invoice = $this->sut->createInvoice($customer, $data);
+
+    // then
+    $this->expectInvoiceToBeEqualsToData($invoice, $data);
+});
+
 test('createInvoice creates allows specifying custom payer for invoice', function () {
     // given
     $customer = Customer::factory()->create();
@@ -267,10 +308,7 @@ test('createInvoice creates allows specifying custom payer for invoice', functio
         ->addItem($item)
         ->get();
     $payer = $this->createCustomerDTO();
-    $this->mockGatewayMultipleSupportedFeatures([
-        GatewayFeature::INVOICE()->value => true,
-        GatewayFeature::INVOICE_SPLIT()->value => true,
-    ]);
+    $this->mockGatewaySupportedFeature(GatewayFeature::INVOICE());
     $this->gatewayMock
         ->expects(once())
         ->method('createInvoice')
