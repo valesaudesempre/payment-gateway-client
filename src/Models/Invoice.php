@@ -26,6 +26,7 @@ use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
  * @property string|null                    $url
  * @property CarbonImmutable                $due_date
  * @property InvoicePaymentMethodCollection $available_payment_methods
+ * @property InvoiceSplitRuleCollection     $splits
  * @property int                            $max_installments
  * @property InvoiceStatus                  $status
  * @property Money                          $total
