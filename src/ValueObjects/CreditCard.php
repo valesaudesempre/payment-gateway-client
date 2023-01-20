@@ -5,8 +5,11 @@ namespace ValeSaude\PaymentGatewayClient\ValueObjects;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Support\Arrayable;
-use ValeSaude\PaymentGatewayClient\Casts\JsonSerializableValueObjectCast;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Contracts\JsonSerializableValueObjectInterface;
+use ValeSaude\LaravelValueObjects\AbstractValueObject;
+use ValeSaude\LaravelValueObjects\Casts\JsonSerializableValueObjectCast;
+use ValeSaude\LaravelValueObjects\Contracts\JsonSerializableValueObjectInterface;
+use ValeSaude\LaravelValueObjects\Month;
+use ValeSaude\LaravelValueObjects\PositiveInteger;
 
 class CreditCard extends AbstractValueObject implements Arrayable, Castable, JsonSerializableValueObjectInterface
 {

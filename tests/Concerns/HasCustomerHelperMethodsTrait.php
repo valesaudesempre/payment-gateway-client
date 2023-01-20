@@ -2,13 +2,13 @@
 
 namespace ValeSaude\PaymentGatewayClient\Tests\Concerns;
 
+use ValeSaude\LaravelValueObjects\Month;
+use ValeSaude\LaravelValueObjects\PositiveInteger;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Models\Customer;
 use ValeSaude\PaymentGatewayClient\Tests\TestCase;
 use ValeSaude\PaymentGatewayClient\ValueObjects\CreditCard;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Month;
-use ValeSaude\PaymentGatewayClient\ValueObjects\PositiveInteger;
 
 /**
  * @mixin TestCase

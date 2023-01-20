@@ -3,6 +3,7 @@
 namespace ValeSaude\PaymentGatewayClient\Tests\Concerns;
 
 use Carbon\CarbonImmutable;
+use ValeSaude\LaravelValueObjects\Money;
 use ValeSaude\PaymentGatewayClient\Collections\InvoiceSplitRuleCollection;
 use ValeSaude\PaymentGatewayClient\Invoice\Builders\InvoiceBuilder;
 use ValeSaude\PaymentGatewayClient\Invoice\Collections\GatewayInvoiceItemDTOCollection;
@@ -16,7 +17,6 @@ use ValeSaude\PaymentGatewayClient\Models\Invoice;
 use ValeSaude\PaymentGatewayClient\Models\InvoiceItem;
 use ValeSaude\PaymentGatewayClient\Tests\TestCase;
 use ValeSaude\PaymentGatewayClient\ValueObjects\InvoiceSplitRule;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 /**
  * @mixin TestCase

@@ -4,6 +4,7 @@ namespace ValeSaude\PaymentGatewayClient\Invoice\Builders;
 
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
+use ValeSaude\LaravelValueObjects\Money;
 use ValeSaude\PaymentGatewayClient\Collections\InvoiceSplitRuleCollection;
 use ValeSaude\PaymentGatewayClient\Invoice\Collections\InvoiceItemDTOCollection;
 use ValeSaude\PaymentGatewayClient\Invoice\Collections\InvoicePaymentMethodCollection;
@@ -12,7 +13,6 @@ use ValeSaude\PaymentGatewayClient\Invoice\InvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\InvoiceItemDTO;
 use ValeSaude\PaymentGatewayClient\Models\Recipient;
 use ValeSaude\PaymentGatewayClient\ValueObjects\InvoiceSplitRule;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 class InvoiceBuilder
 {

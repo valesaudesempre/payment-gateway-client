@@ -1,8 +1,8 @@
 <?php
 
+use ValeSaude\LaravelValueObjects\Money;
 use ValeSaude\PaymentGatewayClient\Models\Invoice;
 use ValeSaude\PaymentGatewayClient\Models\InvoiceItem;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 test('getTotalAttribute returns sum of each item price times its quantity', function () {
     // given

@@ -2,12 +2,12 @@
 
 namespace ValeSaude\PaymentGatewayClient\Gateways\Iugu\Builders;
 
-use ValeSaude\PaymentGatewayClient\Enums\DocumentType;
+use ValeSaude\LaravelValueObjects\Address;
+use ValeSaude\LaravelValueObjects\BankAccount;
+use ValeSaude\LaravelValueObjects\Document;
+use ValeSaude\LaravelValueObjects\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\Gateways\Iugu\Utils\IuguAttributeConverter;
 use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
-use ValeSaude\PaymentGatewayClient\ValueObjects\BankAccount;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
 
 class IuguRecipientBuilder extends AbstractIuguBuilder
 {

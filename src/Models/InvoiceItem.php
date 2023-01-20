@@ -5,10 +5,10 @@ namespace ValeSaude\PaymentGatewayClient\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use ValeSaude\LaravelValueObjects\Money;
 use ValeSaude\PaymentGatewayClient\Database\Factories\InvoiceItemFactory;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 /**
  * @property Money  $price

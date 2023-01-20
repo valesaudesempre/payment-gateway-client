@@ -5,6 +5,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use ValeSaude\LaravelValueObjects\Money;
 use ValeSaude\PaymentGatewayClient\Gateways\Enums\GatewayFeature;
 use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\InvalidPaymentTokenException;
 use ValeSaude\PaymentGatewayClient\Gateways\Exceptions\TransactionDeclinedException;
@@ -19,7 +20,6 @@ use ValeSaude\PaymentGatewayClient\Models\Recipient;
 use ValeSaude\PaymentGatewayClient\Recipient\Enums\RecipientStatus;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasCustomerHelperMethodsTrait;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasRecipientHelperMethodsTrait;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 uses(
     HasCustomerHelperMethodsTrait::class,

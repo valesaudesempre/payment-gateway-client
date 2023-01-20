@@ -2,16 +2,16 @@
 
 use Illuminate\Support\Str;
 use PHPUnit\Framework\AssertionFailedError;
+use ValeSaude\LaravelValueObjects\Document;
+use ValeSaude\LaravelValueObjects\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Customer\GatewayPaymentMethodDTO;
-use ValeSaude\PaymentGatewayClient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\FakeClient;
 use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasCustomerHelperMethodsTrait;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasInvoiceHelperMethodsTrait;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasRecipientHelperMethodsTrait;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
 
 uses(
     HasCustomerHelperMethodsTrait::class,

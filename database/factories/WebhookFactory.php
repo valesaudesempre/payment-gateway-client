@@ -4,8 +4,8 @@ namespace ValeSaude\PaymentGatewayClient\Database\Factories;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use ValeSaude\LaravelValueObjects\JsonObject;
 use ValeSaude\PaymentGatewayClient\Models\Webhook;
-use ValeSaude\PaymentGatewayClient\ValueObjects\JsonObject;
 use ValeSaude\PaymentGatewayClient\Webhook\WebhookStatus;
 
 class WebhookFactory extends Factory

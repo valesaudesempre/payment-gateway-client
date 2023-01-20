@@ -2,7 +2,7 @@
 
 namespace ValeSaude\PaymentGatewayClient\Invoice;
 
-use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
+use ValeSaude\LaravelValueObjects\Money;
 
 class GatewayInvoiceItemDTO
 {

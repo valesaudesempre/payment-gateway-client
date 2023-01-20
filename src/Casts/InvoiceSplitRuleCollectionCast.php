@@ -2,9 +2,9 @@
 
 namespace ValeSaude\PaymentGatewayClient\Casts;
 
+use ValeSaude\LaravelValueObjects\Money;
 use ValeSaude\PaymentGatewayClient\Collections\InvoiceSplitRuleCollection;
 use ValeSaude\PaymentGatewayClient\ValueObjects\InvoiceSplitRule;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 /**
  * @extends AbstractCollectionCast<InvoiceSplitRule, InvoiceSplitRuleCollection>

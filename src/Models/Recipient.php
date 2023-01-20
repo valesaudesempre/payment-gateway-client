@@ -4,8 +4,13 @@ namespace ValeSaude\PaymentGatewayClient\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use ValeSaude\LaravelValueObjects\Address;
+use ValeSaude\LaravelValueObjects\BankAccount;
+use ValeSaude\LaravelValueObjects\Document;
+use ValeSaude\LaravelValueObjects\Enums\DocumentType;
+use ValeSaude\LaravelValueObjects\JsonObject;
+use ValeSaude\LaravelValueObjects\Phone;
 use ValeSaude\PaymentGatewayClient\Database\Factories\RecipientFactory;
-use ValeSaude\PaymentGatewayClient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasOwnerTrait;
@@ -13,11 +18,6 @@ use ValeSaude\PaymentGatewayClient\QueryBuilders\RecipientQueryBuilder;
 use ValeSaude\PaymentGatewayClient\Recipient\Enums\RecipientStatus;
 use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
 use ValeSaude\PaymentGatewayClient\Recipient\RepresentativeDTO;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
-use ValeSaude\PaymentGatewayClient\ValueObjects\BankAccount;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
-use ValeSaude\PaymentGatewayClient\ValueObjects\JsonObject;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Phone;
 
 /**
  * @property string            $name

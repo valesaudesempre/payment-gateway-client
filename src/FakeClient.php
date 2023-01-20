@@ -5,6 +5,7 @@ namespace ValeSaude\PaymentGatewayClient;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 use Illuminate\Testing\Assert;
+use ValeSaude\LaravelValueObjects\Money;
 use ValeSaude\PaymentGatewayClient\Contracts\ClientInterface;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Customer\GatewayPaymentMethodDTO;
@@ -23,7 +24,6 @@ use ValeSaude\PaymentGatewayClient\Models\PaymentMethod;
 use ValeSaude\PaymentGatewayClient\Models\Recipient;
 use ValeSaude\PaymentGatewayClient\Recipient\Enums\RecipientStatus;
 use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 class FakeClient implements ClientInterface
 {

@@ -2,8 +2,8 @@
 
 namespace ValeSaude\PaymentGatewayClient\Recipient;
 
+use ValeSaude\LaravelValueObjects\JsonObject;
 use ValeSaude\PaymentGatewayClient\Recipient\Enums\RecipientStatus;
-use ValeSaude\PaymentGatewayClient\ValueObjects\JsonObject;
 
 class GatewayRecipientDTO
 {

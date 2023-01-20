@@ -6,11 +6,11 @@ use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use ValeSaude\LaravelValueObjects\JsonObject;
 use ValeSaude\PaymentGatewayClient\Database\Factories\WebhookFactory;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasDefaultAttributesOnInitializeTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
-use ValeSaude\PaymentGatewayClient\ValueObjects\JsonObject;
 use ValeSaude\PaymentGatewayClient\Webhook\WebhookStatus;
 
 /**

@@ -3,11 +3,11 @@
 namespace ValeSaude\PaymentGatewayClient\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use ValeSaude\LaravelValueObjects\Month;
+use ValeSaude\LaravelValueObjects\PositiveInteger;
 use ValeSaude\PaymentGatewayClient\Models\Customer;
 use ValeSaude\PaymentGatewayClient\Models\PaymentMethod;
 use ValeSaude\PaymentGatewayClient\ValueObjects\CreditCard;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Month;
-use ValeSaude\PaymentGatewayClient\ValueObjects\PositiveInteger;
 
 class PaymentMethodFactory extends Factory
 {

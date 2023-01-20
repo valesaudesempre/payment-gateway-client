@@ -2,6 +2,8 @@
 
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
+use ValeSaude\LaravelValueObjects\JsonObject;
+use ValeSaude\LaravelValueObjects\Money;
 use ValeSaude\PaymentGatewayClient\Client;
 use ValeSaude\PaymentGatewayClient\Customer\GatewayPaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Exceptions\UnsupportedFeatureException;
@@ -24,8 +26,6 @@ use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasCustomerHelperMethodsTrait;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasInvoiceHelperMethodsTrait;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\HasRecipientHelperMethodsTrait;
 use ValeSaude\PaymentGatewayClient\Tests\Concerns\MocksGatewayMethodsTrait;
-use ValeSaude\PaymentGatewayClient\ValueObjects\JsonObject;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 use function PHPUnit\Framework\callback;
 use function PHPUnit\Framework\never;
 use function PHPUnit\Framework\once;

@@ -2,7 +2,7 @@
 
 namespace ValeSaude\PaymentGatewayClient\Recipient;
 
-use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
+use ValeSaude\LaravelValueObjects\Document;
 
 class RepresentativeDTO
 {

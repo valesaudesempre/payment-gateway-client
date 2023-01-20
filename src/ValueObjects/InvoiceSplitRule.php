@@ -3,7 +3,9 @@
 namespace ValeSaude\PaymentGatewayClient\ValueObjects;
 
 use Illuminate\Contracts\Support\Arrayable;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Contracts\JsonSerializableValueObjectInterface;
+use ValeSaude\LaravelValueObjects\AbstractValueObject;
+use ValeSaude\LaravelValueObjects\Contracts\JsonSerializableValueObjectInterface;
+use ValeSaude\LaravelValueObjects\Money;
 
 class InvoiceSplitRule extends AbstractValueObject implements Arrayable, JsonSerializableValueObjectInterface
 {

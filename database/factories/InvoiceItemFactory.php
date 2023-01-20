@@ -3,9 +3,9 @@
 namespace ValeSaude\PaymentGatewayClient\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use ValeSaude\LaravelValueObjects\Money;
 use ValeSaude\PaymentGatewayClient\Models\Invoice;
 use ValeSaude\PaymentGatewayClient\Models\InvoiceItem;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 class InvoiceItemFactory extends Factory
 {

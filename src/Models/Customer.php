@@ -6,16 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
+use ValeSaude\LaravelValueObjects\Address;
+use ValeSaude\LaravelValueObjects\Document;
+use ValeSaude\LaravelValueObjects\Email;
+use ValeSaude\LaravelValueObjects\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Database\Factories\CustomerFactory;
-use ValeSaude\PaymentGatewayClient\Enums\DocumentType;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasOwnerTrait;
 use ValeSaude\PaymentGatewayClient\QueryBuilders\CustomerQueryBuilder;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Email;
 
 /**
  * @property string       $name

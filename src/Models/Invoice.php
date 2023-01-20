@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
+use ValeSaude\LaravelValueObjects\Money;
 use ValeSaude\PaymentGatewayClient\Casts\InvoicePaymentMethodCollectionCast;
 use ValeSaude\PaymentGatewayClient\Casts\InvoiceSplitRuleCollectionCast;
 use ValeSaude\PaymentGatewayClient\Collections\InvoiceSplitRuleCollection;
@@ -20,7 +21,6 @@ use ValeSaude\PaymentGatewayClient\Models\Concerns\GeneratesUUIDOnInitializeTrai
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasGatewayIdTrait;
 use ValeSaude\PaymentGatewayClient\Models\Concerns\HasOwnerTrait;
 use ValeSaude\PaymentGatewayClient\QueryBuilders\InvoiceQueryBuilder;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 /**
  * @property string|null                    $url

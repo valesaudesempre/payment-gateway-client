@@ -7,6 +7,9 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
+use ValeSaude\LaravelValueObjects\JsonObject;
+use ValeSaude\LaravelValueObjects\Month;
+use ValeSaude\LaravelValueObjects\PositiveInteger;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Customer\GatewayPaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
@@ -26,9 +29,6 @@ use ValeSaude\PaymentGatewayClient\Recipient\Enums\RecipientStatus;
 use ValeSaude\PaymentGatewayClient\Recipient\GatewayRecipientDTO;
 use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
 use ValeSaude\PaymentGatewayClient\ValueObjects\CreditCard;
-use ValeSaude\PaymentGatewayClient\ValueObjects\JsonObject;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Month;
-use ValeSaude\PaymentGatewayClient\ValueObjects\PositiveInteger;
 
 class IuguGateway extends AbstractGateway
 {

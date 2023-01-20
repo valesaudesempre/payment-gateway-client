@@ -2,9 +2,9 @@
 
 namespace ValeSaude\PaymentGatewayClient\Customer;
 
-use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Email;
+use ValeSaude\LaravelValueObjects\Address;
+use ValeSaude\LaravelValueObjects\Document;
+use ValeSaude\LaravelValueObjects\Email;
 
 class CustomerDTO
 {

@@ -3,12 +3,12 @@
 namespace ValeSaude\PaymentGatewayClient\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use ValeSaude\PaymentGatewayClient\Enums\DocumentType;
+use ValeSaude\LaravelValueObjects\Address;
+use ValeSaude\LaravelValueObjects\Document;
+use ValeSaude\LaravelValueObjects\Email;
+use ValeSaude\LaravelValueObjects\Enums\DocumentType;
+use ValeSaude\LaravelValueObjects\ZipCode;
 use ValeSaude\PaymentGatewayClient\Models\Customer;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Email;
-use ValeSaude\PaymentGatewayClient\ValueObjects\ZipCode;
 
 class CustomerFactory extends Factory
 {

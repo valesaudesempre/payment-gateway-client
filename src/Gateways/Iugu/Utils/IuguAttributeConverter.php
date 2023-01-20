@@ -4,13 +4,13 @@ namespace ValeSaude\PaymentGatewayClient\Gateways\Iugu\Utils;
 
 use Carbon\CarbonImmutable;
 use InvalidArgumentException;
+use ValeSaude\LaravelValueObjects\Enums\BankAccountType;
+use ValeSaude\LaravelValueObjects\Money;
 use ValeSaude\PaymentGatewayClient\Invoice\Collections\GatewayInvoiceItemDTOCollection;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoicePaymentMethod;
 use ValeSaude\PaymentGatewayClient\Invoice\Enums\InvoiceStatus;
 use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceDTO;
 use ValeSaude\PaymentGatewayClient\Invoice\GatewayInvoiceItemDTO;
-use ValeSaude\PaymentGatewayClient\Recipient\Enums\BankAccountType;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Money;
 
 final class IuguAttributeConverter
 {

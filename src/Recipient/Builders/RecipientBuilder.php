@@ -2,13 +2,13 @@
 
 namespace ValeSaude\PaymentGatewayClient\Recipient\Builders;
 
+use ValeSaude\LaravelValueObjects\Address;
+use ValeSaude\LaravelValueObjects\BankAccount;
+use ValeSaude\LaravelValueObjects\Document;
+use ValeSaude\LaravelValueObjects\JsonObject;
+use ValeSaude\LaravelValueObjects\Phone;
 use ValeSaude\PaymentGatewayClient\Recipient\RecipientDTO;
 use ValeSaude\PaymentGatewayClient\Recipient\RepresentativeDTO;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
-use ValeSaude\PaymentGatewayClient\ValueObjects\BankAccount;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
-use ValeSaude\PaymentGatewayClient\ValueObjects\JsonObject;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Phone;
 
 class RecipientBuilder
 {

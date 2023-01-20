@@ -3,17 +3,17 @@
 namespace ValeSaude\PaymentGatewayClient\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use ValeSaude\PaymentGatewayClient\Enums\DocumentType;
+use ValeSaude\LaravelValueObjects\Address;
+use ValeSaude\LaravelValueObjects\Bank;
+use ValeSaude\LaravelValueObjects\BankAccount;
+use ValeSaude\LaravelValueObjects\Document;
+use ValeSaude\LaravelValueObjects\Enums\BankAccountType;
+use ValeSaude\LaravelValueObjects\Enums\DocumentType;
+use ValeSaude\LaravelValueObjects\JsonObject;
+use ValeSaude\LaravelValueObjects\Phone;
+use ValeSaude\LaravelValueObjects\ZipCode;
 use ValeSaude\PaymentGatewayClient\Models\Recipient;
-use ValeSaude\PaymentGatewayClient\Recipient\Enums\BankAccountType;
 use ValeSaude\PaymentGatewayClient\Recipient\Enums\RecipientStatus;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Address;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Bank;
-use ValeSaude\PaymentGatewayClient\ValueObjects\BankAccount;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Document;
-use ValeSaude\PaymentGatewayClient\ValueObjects\JsonObject;
-use ValeSaude\PaymentGatewayClient\ValueObjects\Phone;
-use ValeSaude\PaymentGatewayClient\ValueObjects\ZipCode;
 
 class RecipientFactory extends Factory
 {
