@@ -81,6 +81,12 @@ final class IuguAttributeConverter
         $paidAt = data_get($response, 'paid_at')
             ? CarbonImmutable::make(data_get($response, 'paid_at'))
             : null;
+        $refundedAt = data_get($response, 'refunded_at_iso')
+            ? CarbonImmutable::make(data_get($response, 'refunded_at_iso'))
+            : null;
+        $refundedAmount = data_get($response, 'refunded_cents')
+            ? new Money(data_get($response, 'refunded_cents'))
+            : null;
 
         return new GatewayInvoiceDTO(
             data_get($response, 'id'),
@@ -93,6 +99,8 @@ final class IuguAttributeConverter
             data_get($response, 'bank_slip.digitable_line'),
             data_get($response, 'pix.qrcode_text'),
             $paidAt,
+            $refundedAt,
+            $refundedAmount
         );
     }
 

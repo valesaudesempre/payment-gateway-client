@@ -468,6 +468,42 @@ test('chargeInvoiceUsingToken throws RequestException on HTTP error response', f
     $this->sut->chargeInvoiceUsingToken('some-invoice-id', 'some-token');
 })->throws(RequestException::class);
 
+test('refundInvoice POST to v1/invoices/{invoice_id}/refund without partial value when refundValue is not provided', function () use ($baseUrl) {
+    // given
+    Http::fake(["{$baseUrl}/v1/invoices/some-invoice-id/refund" => Http::response()]);
+
+    // when
+    $this->sut->refundInvoice('some-invoice-id');
+
+    // Then
+    Http::assertSent(static function (Request $request) {
+        return empty($request->data());
+    });
+});
+
+test('refundInvoice POST to v1/invoices/{invoice_id}/refund with partial value when refundValue is provided', function () use ($baseUrl) {
+    // given
+    Http::fake(["{$baseUrl}/v1/invoices/some-invoice-id/refund" => Http::response()]);
+
+    // when
+    $this->sut->refundInvoice('some-invoice-id', new Money(100));
+
+    // Then
+    Http::assertSent(static function (Request $request) {
+        $partialValue = $request->data()['partial_value_refund_cents'];
+
+        return $partialValue === 100;
+    });
+});
+
+test('refundInvoice throws RequestException on HTTP error response', function () use ($baseUrl) {
+    // given
+    Http::fake(["{$baseUrl}/v1/invoices/some-invoice-id/refund" => Http::response(null, 400)]);
+
+    // when
+    $this->sut->refundInvoice('some-invoice-id');
+})->throws(RequestException::class);
+
 test('createRecipient POST to v1/marketplace/create_account then POST to v1/accounts/{account_id}/request_verification and return GatewayRecipientDTO on success', function () use ($baseUrl) {
     // given
     $data = $this->createRecipientDTO();

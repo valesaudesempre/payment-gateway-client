@@ -3,6 +3,7 @@
 namespace ValeSaude\PaymentGatewayClient\Tests\Dummies;
 
 use BadMethodCallException;
+use ValeSaude\LaravelValueObjects\Money;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Customer\GatewayPaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
@@ -55,6 +56,11 @@ class DummyGateway implements GatewayInterface
     }
 
     public function chargeInvoiceUsingToken(string $invoiceId, string $token, int $installments = 1): void
+    {
+        throw new BadMethodCallException('Not implemented.');
+    }
+
+    public function refundInvoice(string $invoiceId, ?Money $refundValue = null): void
     {
         throw new BadMethodCallException('Not implemented.');
     }

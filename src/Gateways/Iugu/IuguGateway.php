@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
 use ValeSaude\LaravelValueObjects\JsonObject;
+use ValeSaude\LaravelValueObjects\Money;
 use ValeSaude\LaravelValueObjects\Month;
 use ValeSaude\LaravelValueObjects\PositiveInteger;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
@@ -195,6 +196,17 @@ class IuguGateway extends AbstractGateway
             // Devido a isso, precisamos tratar também os "sucessos" como um possível erro
             $this->handleErrors($response);
         }
+    }
+
+    public function refundInvoice(string $invoiceId, ?Money $refundValue = null): void
+    {
+        $this->doRequest(
+            'POST',
+            "v1/invoices/{$invoiceId}/refund",
+            $refundValue
+                ? ['partial_value_refund_cents' => $refundValue->getCents()]
+                : []
+        );
     }
 
     public function createRecipient(RecipientDTO $data): GatewayRecipientDTO

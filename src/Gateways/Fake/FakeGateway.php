@@ -5,6 +5,7 @@ namespace ValeSaude\PaymentGatewayClient\Gateways\Fake;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 use ValeSaude\LaravelValueObjects\JsonObject;
+use ValeSaude\LaravelValueObjects\Money;
 use ValeSaude\LaravelValueObjects\Month;
 use ValeSaude\LaravelValueObjects\PositiveInteger;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
@@ -222,6 +223,33 @@ class FakeGateway implements GatewayInterface
         $this->invoices[$customerId][$invoiceId]['data']->paidAt = CarbonImmutable::now();
         $this->invoices[$customerId][$invoiceId]['data']->installments = $installments;
         $this->invoices[$customerId][$invoiceId]['token'] = $token;
+    }
+
+    public function refundInvoice(string $invoiceId, ?Money $refundValue = null): void
+    {
+        $customerId = null;
+
+        foreach ($this->invoices as $invoiceCustomerId => $invoices) {
+            if (isset($invoices[$invoiceId])) {
+                $customerId = $invoiceCustomerId;
+                break;
+            }
+        }
+
+        if (!isset($customerId)) {
+            throw new GatewayException('Invalid invoice id.');
+        }
+
+        $invoice = $this->invoices[$customerId][$invoiceId]['data'];
+        $total = array_sum($invoice->items->map(fn (GatewayInvoiceItemDTO $item) => $item->price->getCents()));
+
+        if (!$invoice->status->equals(InvoiceStatus::PAID())) {
+            throw new GatewayException('The invoice must be paid.');
+        }
+
+        $this->invoices[$customerId][$invoiceId]['data']->status = InvoiceStatus::REFUNDED();
+        $this->invoices[$customerId][$invoiceId]['data']->refundedAt = CarbonImmutable::now();
+        $this->invoices[$customerId][$invoiceId]['data']->refundedAmount = $refundValue ?? new Money($total);
     }
 
     public function createRecipient(RecipientDTO $data): GatewayRecipientDTO
