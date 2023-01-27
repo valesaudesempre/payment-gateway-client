@@ -491,6 +491,54 @@ test('chargeInvoiceUsingToken charges an invoice using its gateway and returns t
         ->and($invoice->installments)->toEqual($installments);
 });
 
+test('refundInvoice partially throws when gateway does not support INVOICE_PARTIAL_REFUND feature and refundAmount is provided', function () {
+    // given
+    $invoice = Invoice::factory()->paid()->create();
+    $this->mockGatewaySupportedFeature(GatewayFeature::INVOICE_PARTIAL_REFUND(), false);
+
+    // when
+    $this->sut->refundInvoice($invoice, new Money(999999));
+})->throws(
+    UnsupportedFeatureException::class,
+    'The gateway "mock" does not support "INVOICE_PARTIAL_REFUND" feature.'
+);
+
+test('refundInvoice refunds an invoice using its gateway and returns the refunded Invoice instance', function () {
+    // given
+    $invoice = Invoice::factory()->paid()->create();
+    $this->gatewayMock
+        ->expects(once())
+        ->method('refundInvoice')
+        ->with($invoice->gateway_id);
+
+    // when
+    $this->sut->refundInvoice($invoice);
+
+    // then
+    expect($invoice->status->equals(InvoiceStatus::REFUNDED()))->toBeTrue()
+        ->and($invoice->refunded_at->toDateString())->toEqual(CarbonImmutable::today()->toDateString())
+        ->and($invoice->refunded_amount)->toEqual($invoice->total);
+});
+
+test('refundInvoice partially refunds an invoice using its gateway and returns the refunded Invoice instance when refundAmount is provided', function () {
+    // given
+    $this->mockGatewaySupportedFeature(GatewayFeature::INVOICE_PARTIAL_REFUND());
+    $invoice = Invoice::factory()->paid()->create();
+    $refundAmount = new Money(999999);
+    $this->gatewayMock
+        ->expects(once())
+        ->method('refundInvoice')
+        ->with($invoice->gateway_id, $refundAmount);
+
+    // when
+    $this->sut->refundInvoice($invoice, $refundAmount);
+
+    // then
+    expect($invoice->status->equals(InvoiceStatus::REFUNDED()))->toBeTrue()
+        ->and($invoice->refunded_at->toDateString())->toEqual(CarbonImmutable::today()->toDateString())
+        ->and($invoice->refunded_amount)->toEqual($refundAmount);
+});
+
 test('createRecipient creates a recipient using its gateway and returns the Recipient instance when gateway supports RECIPIENT feature', function () {
     // given
     $data = $this->createRecipientDTO();

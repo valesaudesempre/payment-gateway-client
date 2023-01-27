@@ -4,6 +4,7 @@ use Illuminate\Support\Str;
 use PHPUnit\Framework\AssertionFailedError;
 use ValeSaude\LaravelValueObjects\Document;
 use ValeSaude\LaravelValueObjects\Enums\DocumentType;
+use ValeSaude\LaravelValueObjects\Money;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Customer\GatewayPaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\FakeClient;
@@ -281,6 +282,68 @@ test('assertInvoiceNotPaid throws when expectation at least one invoice was paid
 test('assertInvoiceNotPaid correctly asserts no invoice paid', function () {
     // when
     $this->sut->assertInvoiceNotPaid();
+});
+
+test('assertInvoiceRefunded throws AssertionFailedException when expectation is not provided and no invoice was refunded', function () {
+    // then
+    $this->expectExceptionObject(new AssertionFailedError('Failed asserting that any invoice was refunded.'));
+
+    // when
+    $this->sut->assertInvoiceRefunded();
+});
+
+test('assertInvoiceRefunded throws when expectation does not match any paid invoice', function () {
+    // given
+    $customer = $this->sut->mockExistingCustomer();
+    $this->sut->createInvoice($customer, $this->createInvoiceDTO());
+    $this->sut->createInvoice($customer, $this->createInvoiceDTO());
+
+    // then
+    $this->expectExceptionObject(new AssertionFailedError('Failed asserting that a given invoice was refunded.'));
+
+    // when
+    $this->sut->assertInvoiceRefunded(function (GatewayInvoiceDTO $data) {
+        return $data->id === (string) Str::uuid();
+    });
+});
+
+test('assertInvoiceRefunded correctly asserts refunded invoices', function () {
+    // given
+    $customer = $this->sut->mockExistingCustomer();
+    $this->sut->mockExistingInvoice($customer);
+    $totallyRefundedInvoice = $this->sut->mockExistingInvoice($customer);
+    $partiallyRefundedInvoice = $this->sut->mockExistingInvoice($customer);
+    $this->sut->chargeInvoiceUsingToken($totallyRefundedInvoice, 'some-token');
+    $this->sut->chargeInvoiceUsingToken($partiallyRefundedInvoice, 'some-token');
+    $this->sut->refundInvoice($totallyRefundedInvoice);
+    $this->sut->refundInvoice($partiallyRefundedInvoice, new Money(999999));
+
+    // when
+    $this->sut->assertInvoiceRefunded();
+    $this->sut->assertInvoiceRefunded(static function (GatewayInvoiceDTO $data) use ($totallyRefundedInvoice) {
+        return $data->id === $totallyRefundedInvoice->gateway_id && $data->refundedAmount->equals($totallyRefundedInvoice->total);
+    });
+    $this->sut->assertInvoiceRefunded(static function (GatewayInvoiceDTO $data) use ($partiallyRefundedInvoice) {
+        return $data->id === $partiallyRefundedInvoice->gateway_id && $data->refundedAmount->equals(new Money(999999));
+    });
+});
+
+test('assertInvoiceNotRefunded throws when expectation at least one invoice was refunded', function () {
+    // given
+    $invoice = $this->sut->mockExistingInvoice();
+    $this->sut->chargeInvoiceUsingToken($invoice, 'some-token');
+    $this->sut->refundInvoice($invoice);
+
+    // then
+    $this->expectExceptionObject(new AssertionFailedError('Failed asserting that no invoice was refunded.'));
+
+    // when
+    $this->sut->assertInvoiceNotRefunded();
+});
+
+test('assertInvoiceNotRefunded correctly asserts no invoice refunded', function () {
+    // when
+    $this->sut->assertInvoiceNotRefunded();
 });
 
 test('assertRecipientCreated throws AssertionFailedException when expectation is not provided and no customer was created', function () {

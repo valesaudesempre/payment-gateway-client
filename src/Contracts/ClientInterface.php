@@ -2,6 +2,7 @@
 
 namespace ValeSaude\PaymentGatewayClient\Contracts;
 
+use ValeSaude\LaravelValueObjects\Money;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
 use ValeSaude\PaymentGatewayClient\Gateways\Contracts\GatewayInterface;
@@ -38,6 +39,8 @@ interface ClientInterface
     ): Invoice;
 
     public function chargeInvoiceUsingToken(Invoice $invoice, string $token, int $installments = 1): Invoice;
+
+    public function refundInvoice(Invoice $invoice, ?Money $refundedAmount = null): Invoice;
 
     public function createRecipient(RecipientDTO $data): Recipient;
 

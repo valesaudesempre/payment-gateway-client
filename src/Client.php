@@ -4,6 +4,7 @@ namespace ValeSaude\PaymentGatewayClient;
 
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use ValeSaude\LaravelValueObjects\Money;
 use ValeSaude\PaymentGatewayClient\Contracts\ClientInterface;
 use ValeSaude\PaymentGatewayClient\Customer\CustomerDTO;
 use ValeSaude\PaymentGatewayClient\Customer\PaymentMethodDTO;
@@ -161,8 +162,8 @@ class Client implements ClientInterface
         } elseif ($data->status->equals(InvoiceStatus::CANCELED())) {
             $invoice->markAsCanceled();
         } elseif ($data->status->equals(InvoiceStatus::REFUNDED())) {
-            // TODO: Utilizar valor reembolsado constante no gateway
-            $invoice->markAsRefunded($invoice->total);
+            // @phpstan-ignore-next-line
+            $invoice->markAsRefunded($data->refundedAmount);
         }
 
         return $invoice;
@@ -207,6 +208,20 @@ class Client implements ClientInterface
 
         $invoice->installments = $installments;
         $invoice->markAsPaid();
+
+        return $invoice;
+    }
+
+    public function refundInvoice(Invoice $invoice, ?Money $refundedAmount = null): Invoice
+    {
+        if ($refundedAmount && $invoice->total->getCents() !== $refundedAmount->getCents()) {
+            $this->ensureFeatureIsSupported(GatewayFeature::INVOICE_PARTIAL_REFUND());
+        }
+
+        // @phpstan-ignore-next-line
+        $this->gateway->refundInvoice($invoice->gateway_id, $refundedAmount);
+
+        $invoice->markAsRefunded($refundedAmount ?? $invoice->total);
 
         return $invoice;
     }

@@ -112,6 +112,14 @@ class FakeClient implements ClientInterface
     /**
      * @codeCoverageIgnore
      */
+    public function refundInvoice(Invoice $invoice, ?Money $refundedAmount = null): Invoice
+    {
+        return $this->client->refundInvoice($invoice, $refundedAmount);
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
     public function createRecipient(RecipientDTO $data): Recipient
     {
         return $this->client->createRecipient($data);
@@ -312,6 +320,63 @@ class FakeClient implements ClientInterface
         Assert::assertEmpty(
             $paidInvoices,
             'Failed asserting that no invoice was paid.'
+        );
+    }
+
+    /**
+     * @param callable(GatewayInvoiceDTO $data=, string $externalReference=, string $customerId=): bool $expectation
+     */
+    public function assertInvoiceRefunded(?callable $expectation = null): void
+    {
+        $wasRefunded = false;
+
+        $refundedInvoices = array_filter(
+            $this->gateway->getInvoices(),
+            static function (array $invoices) {
+                return array_filter(
+                    $invoices,
+                    static fn (array $params) => $params['data']->status->equals(InvoiceStatus::REFUNDED())
+                );
+            }
+        );
+
+        if ($expectation === null) {
+            Assert::assertNotEmpty(
+                $refundedInvoices,
+                'Failed asserting that any invoice was refunded.'
+            );
+
+            return;
+        }
+
+        foreach ($refundedInvoices as $customerId => $invoices) {
+            foreach ($invoices as $params) {
+                if (true === $expectation($params['data'], $params['external_reference'], $customerId)) {
+                    $wasRefunded = true;
+
+                    break;
+                }
+            }
+        }
+
+        Assert::assertTrue($wasRefunded, 'Failed asserting that a given invoice was refunded.');
+    }
+
+    public function assertInvoiceNotRefunded(): void
+    {
+        $refundedInvoices = array_filter(
+            $this->gateway->getInvoices(),
+            static function (array $invoices) {
+                return array_filter(
+                    $invoices,
+                    static fn (array $params) => $params['data']->status->equals(InvoiceStatus::REFUNDED())
+                );
+            }
+        );
+
+        Assert::assertEmpty(
+            $refundedInvoices,
+            'Failed asserting that no invoice was refunded.'
         );
     }
 
