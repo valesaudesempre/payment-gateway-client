@@ -60,7 +60,7 @@ class DummyGateway implements GatewayInterface
         throw new BadMethodCallException('Not implemented.');
     }
 
-    public function refundInvoice(string $invoiceId, ?Money $refundValue = null): void
+    public function refundInvoice(string $invoiceId, ?Money $refundAmount = null): void
     {
         throw new BadMethodCallException('Not implemented.');
     }

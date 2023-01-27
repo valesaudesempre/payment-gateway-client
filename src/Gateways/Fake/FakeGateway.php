@@ -225,7 +225,7 @@ class FakeGateway implements GatewayInterface
         $this->invoices[$customerId][$invoiceId]['token'] = $token;
     }
 
-    public function refundInvoice(string $invoiceId, ?Money $refundValue = null): void
+    public function refundInvoice(string $invoiceId, ?Money $refundAmount = null): void
     {
         $customerId = null;
 
@@ -249,7 +249,7 @@ class FakeGateway implements GatewayInterface
 
         $this->invoices[$customerId][$invoiceId]['data']->status = InvoiceStatus::REFUNDED();
         $this->invoices[$customerId][$invoiceId]['data']->refundedAt = CarbonImmutable::now();
-        $this->invoices[$customerId][$invoiceId]['data']->refundedAmount = $refundValue ?? new Money($total);
+        $this->invoices[$customerId][$invoiceId]['data']->refundedAmount = $refundAmount ?? new Money($total);
     }
 
     public function createRecipient(RecipientDTO $data): GatewayRecipientDTO

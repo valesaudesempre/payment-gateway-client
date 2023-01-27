@@ -198,13 +198,13 @@ class IuguGateway extends AbstractGateway
         }
     }
 
-    public function refundInvoice(string $invoiceId, ?Money $refundValue = null): void
+    public function refundInvoice(string $invoiceId, ?Money $refundAmount = null): void
     {
         $this->doRequest(
             'POST',
             "v1/invoices/{$invoiceId}/refund",
-            $refundValue
-                ? ['partial_value_refund_cents' => $refundValue->getCents()]
+            $refundAmount
+                ? ['partial_value_refund_cents' => $refundAmount->getCents()]
                 : []
         );
     }
