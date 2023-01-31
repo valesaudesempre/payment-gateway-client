@@ -30,7 +30,7 @@
         "spatie/laravel-enum": "^3.0",
         "illuminate/hashing": "^8.83",
         "illuminate/routing": "^8.83",
-        "valesaude/laravel-value-objects": "^0.0.2"
+        "valesaude/laravel-value-objects": "^0.0.3"
     },
     "require-dev": {
         "phpstan/phpstan": "^1.9",
