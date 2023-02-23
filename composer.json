@@ -30,7 +30,7 @@
         "spatie/laravel-enum": "^3.0",
         "illuminate/hashing": "^8.83",
         "illuminate/routing": "^8.83",
-        "valesaude/laravel-value-objects": "^0.0.3"
+        "valesaude/laravel-value-objects": "^1.0"
     },
     "require-dev": {
         "phpstan/phpstan": "^1.9",
@@ -60,11 +60,5 @@
         "analyse": "phpstan analyze",
         "test": "pest",
         "test:coverage": "pest --coverage"
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/valesaudesempre/laravel-value-objects.git"
-        }
-    ]
+    }
 }
