@@ -15,4 +15,6 @@ return [
     ],
 
     'webhook_processing_queue' => 'default',
+
+    'webhook_route_middlewares' => [],
 ];
