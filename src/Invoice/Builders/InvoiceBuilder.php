@@ -59,10 +59,17 @@ class InvoiceBuilder
         return $this;
     }
 
-    public function addSplit(Recipient $recipient, Money $amount): self
+    /**
+     * @param string|Recipient $recipient
+     */
+    public function addSplit($recipient, Money $amount): self
     {
+        $recipientId = $recipient instanceof Recipient
+            ? $recipient->gateway_id
+            : $recipient;
+
         // @phpstan-ignore-next-line
-        $this->splits->add(new InvoiceSplitRule($recipient->gateway_id, $amount));
+        $this->splits->add(new InvoiceSplitRule($recipientId, $amount));
 
         return $this;
     }
